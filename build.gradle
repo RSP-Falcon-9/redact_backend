@@ -1,13 +1,16 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.9.RELEASE'
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
 	id 'java'
 	id 'eclipse'
+	id "com.webcohesion.enunciate" version "2.12.1"
 }
 
 group = 'cz.falcon9.redact'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+
+def docsPath = "$buildDir/libs/docs"
 
 configurations {
 	developmentOnly
@@ -28,16 +31,31 @@ test {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.flywaydb:flyway-core:5.2.4'
+	implementation 'org.flywaydb:flyway-core:6.0.7'
+	
+	compile 'io.jsonwebtoken:jjwt-api:0.10.7'
+	
 	runtimeOnly 'mysql:mysql-connector-java'
 	runtime 'io.jsonwebtoken:jjwt-impl:0.10.7',
 		'io.jsonwebtoken:jjwt-jackson:0.10.7'
-		
+
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+// regenerate docs upon building
+build.doFirst {
+	File enunciateDistDir = file("$docsPath")
+	enunciateDistDir.deleteDir()
+    enunciateDistDir.mkdirs()
+}
+
+build.doLast {
+	enunciate.export("docs", file("$docsPath"))
 }
