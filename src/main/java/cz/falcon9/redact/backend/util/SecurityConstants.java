@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.utils;
+package cz.falcon9.redact.backend.util;
 
 import java.util.concurrent.TimeUnit;
 

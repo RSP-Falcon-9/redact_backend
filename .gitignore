@@ -5,9 +5,11 @@ bin/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+src/generated/
 
 ### STS ###
 .apt_generated
+.apt_generated_test
 .classpath
 .factorypath
 .project
