@@ -1,61 +1,82 @@
 plugins {
-	id 'org.springframework.boot' version '2.2.0.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
-	id 'java'
-	id 'eclipse'
-	id "com.webcohesion.enunciate" version "2.12.1"
+    id 'java'
+    id 'eclipse'
+    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'com.webcohesion.enunciate' version '2.12.1'
 }
 
 group = 'cz.falcon9.redact'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
-def docsPath = "$buildDir/libs/docs"
-
-configurations {
-	developmentOnly
-	runtimeClasspath {
-		extendsFrom developmentOnly
-	}
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
+def documentationFilesPath = "$buildDir/libs/docs";
+def generatedSourceFilesPath = "$projectDir/src/generated";
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java.srcDirs += generatedSourceFilesPath
+    }
 }
 
 test {
-  useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.flywaydb:flyway-core:6.0.7'
-	
-	compile 'io.jsonwebtoken:jjwt-api:0.10.7'
-	
-	runtimeOnly 'mysql:mysql-connector-java'
-	runtime 'io.jsonwebtoken:jjwt-impl:0.10.7',
-		'io.jsonwebtoken:jjwt-jackson:0.10.7'
-
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+    // Spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-	testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    
+    // Database
+    runtimeOnly 'mysql:mysql-connector-java'
+    
+    // Flyway
+    implementation 'org.flywaydb:flyway-core:6.0.7'
+    
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
+    runtime 'io.jsonwebtoken:jjwt-impl:0.10.7',
+        'io.jsonwebtoken:jjwt-jackson:0.10.7'
+
+    // JUnit
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+    
+    // Immutables
+    annotationProcessor 'org.immutables:value:2.8.1'
+    compileOnly 'org.immutables:value-annotations:2.8.1'
 }
 
 // regenerate docs upon building
-build.doFirst {
-	File enunciateDistDir = file("$docsPath")
-	enunciateDistDir.deleteDir()
-    enunciateDistDir.mkdirs()
+tasks.enunciate {
+    File enunciateDistDir = file(documentationFilesPath)
+    
+    doFirst {
+        enunciateDistDir.deleteDir()
+        enunciateDistDir.mkdirs()
+    }
+    
+    export('docs', enunciateDistDir)
 }
 
-build.doLast {
-	enunciate.export("docs", file("$docsPath"))
+build.dependsOn enunciate
+
+// make generated source files appear in generated directory
+compileJava {
+    File generatedSourcesDir = file(generatedSourceFilesPath)
+    options.annotationProcessorGeneratedSourcesDirectory = file(generatedSourceFilesPath)
+    
+    doFirst {
+      generatedSourcesDir.deleteDir()
+      generatedSourcesDir.mkdirs()
+    }
 }
