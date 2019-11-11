@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.data.auth;
+package cz.falcon9.redact.backend.data.dtos.auth;
 
 import org.immutables.value.Value.Immutable;
 import org.immutables.value.Value.Style;

@@ -1,6 +1,4 @@
-package cz.falcon9.redact.backend.data.auth;
-
-import java.util.List;
+package cz.falcon9.redact.backend.data.dtos.auth;
 
 import org.immutables.value.Value.Immutable;
 
@@ -8,6 +6,5 @@ import org.immutables.value.Value.Immutable;
 public interface LoginResponse {
 
     String getAuthorization();
-    List<String> getRoles();
     
 }

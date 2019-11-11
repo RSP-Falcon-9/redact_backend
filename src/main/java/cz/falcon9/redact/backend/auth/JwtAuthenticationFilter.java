@@ -10,12 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cz.falcon9.redact.backend.data.auth.ImmutableLoginRequest;
-import cz.falcon9.redact.backend.data.auth.ImmutableLoginResponse;
-import cz.falcon9.redact.backend.data.auth.LoginRequest;
-import cz.falcon9.redact.backend.data.auth.LoginResponse;
-import cz.falcon9.redact.backend.util.SecurityConstants;
+import cz.falcon9.redact.backend.data.dtos.auth.ImmutableLoginRequest;
+import cz.falcon9.redact.backend.data.dtos.auth.ImmutableLoginResponse;
+import cz.falcon9.redact.backend.data.dtos.auth.LoginRequest;
+import cz.falcon9.redact.backend.data.dtos.auth.LoginResponse;
+import cz.falcon9.redact.backend.utils.SecurityConstants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,8 @@ import io.jsonwebtoken.security.Keys;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    
     private final AuthenticationManager authenticationManager;
     private final String jwtSecret;
 
@@ -42,12 +46,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         ObjectMapper objectMapper = new ObjectMapper();
-        ImmutableLoginRequest loginRequest;
+        LoginRequest loginRequest;
 
         try {
             loginRequest = objectMapper.readValue(request.getInputStream(), ImmutableLoginRequest.class);
         } catch (Exception ex) {
-            System.out.println("Exception caught: " + ex);
+            logger.debug("Exception caught: " + ex);
             return null;
         }
 
@@ -77,11 +81,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .compact();
 
         try {
-            LoginResponse loginResponse = ImmutableLoginResponse.builder().authorization(SecurityConstants.TOKEN_PREFIX.concat(token)).roles(roles).build();
+            LoginResponse loginResponse = ImmutableLoginResponse.builder().authorization(SecurityConstants.TOKEN_PREFIX.concat(token)).build();
             ObjectMapper mapper = new ObjectMapper();
             
             mapper.writeValue(response.getWriter(), loginResponse);
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+            logger.debug("Exception caught: " + ex);
+        }
     }
 
 }
