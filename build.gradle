@@ -50,10 +50,6 @@ dependencies {
 
     // JUnit
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-    
-    // Immutables
-    annotationProcessor 'org.immutables:value:2.8.1'
-    compileOnly 'org.immutables:value-annotations:2.8.1'
 }
 
 // regenerate docs upon building
@@ -69,14 +65,3 @@ tasks.enunciate {
 }
 
 build.dependsOn enunciate
-
-// make generated source files appear in generated directory
-compileJava {
-    File generatedSourcesDir = file(generatedSourceFilesPath)
-    options.annotationProcessorGeneratedSourcesDirectory = file(generatedSourceFilesPath)
-    
-    doFirst {
-        generatedSourcesDir.deleteDir()
-        generatedSourcesDir.mkdirs()
-    }
-}

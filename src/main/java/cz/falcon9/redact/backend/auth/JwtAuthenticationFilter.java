@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cz.falcon9.redact.backend.data.dtos.auth.ImmutableLoginRequest;
-import cz.falcon9.redact.backend.data.dtos.auth.ImmutableLoginResponse;
 import cz.falcon9.redact.backend.data.dtos.auth.LoginRequest;
 import cz.falcon9.redact.backend.data.dtos.auth.LoginResponse;
 import cz.falcon9.redact.backend.utils.SecurityConstants;
@@ -49,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         LoginRequest loginRequest;
 
         try {
-            loginRequest = objectMapper.readValue(request.getInputStream(), ImmutableLoginRequest.class);
+            loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
         } catch (Exception ex) {
             logger.debug("Exception caught: " + ex);
             return null;
@@ -81,7 +79,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             .compact();
 
         try {
-            LoginResponse loginResponse = ImmutableLoginResponse.builder().authorization(SecurityConstants.TOKEN_PREFIX.concat(token)).build();
+            LoginResponse loginResponse = LoginResponse.builder().withAuthorization(SecurityConstants.TOKEN_PREFIX.concat(token)).build();
             ObjectMapper mapper = new ObjectMapper();
             
             mapper.writeValue(response.getWriter(), loginResponse);

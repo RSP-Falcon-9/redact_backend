@@ -1,16 +1,22 @@
 package cz.falcon9.redact.backend.data.dtos.auth;
 
-import org.immutables.value.Value.Immutable;
-import org.immutables.value.Value.Style;
+import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+public class LoginRequest {
 
-@Immutable
-@Style(builder = "new") // builder has to have constructor
-@JsonDeserialize(builder = ImmutableLoginRequest.Builder.class)
-public interface LoginRequest {
+    @NotNull
+    private String userName;
     
-    String getUserName();
-    String getPassword();
+    @NotNull
+    private String password;
+
+
+    public String getUserName() {
+        return userName;
+    }
     
+    public String getPassword() {
+        return password;
+    }
+
 }

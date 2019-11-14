@@ -1,10 +1,47 @@
 package cz.falcon9.redact.backend.data.dtos.auth;
 
-import org.immutables.value.Value.Immutable;
+import javax.annotation.Generated;
 
-@Immutable
-public interface LoginResponse {
+public class LoginResponse {
 
-    String getAuthorization();
-    
+    private String authorization;
+
+    @Generated("SparkTools")
+    private LoginResponse(Builder builder) {
+        this.authorization = builder.authorization;
+    }
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    /**
+     * Creates builder to build {@link LoginResponse}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder to build {@link LoginResponse}.
+     */
+    @Generated("SparkTools")
+    public static final class Builder {
+        private String authorization;
+
+        private Builder() {
+        }
+
+        public Builder withAuthorization(String authorization) {
+            this.authorization = authorization;
+            return this;
+        }
+
+        public LoginResponse build() {
+            return new LoginResponse(this);
+        }
+    }
+
 }
