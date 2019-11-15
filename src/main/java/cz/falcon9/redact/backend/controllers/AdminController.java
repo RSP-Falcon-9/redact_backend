@@ -2,6 +2,7 @@ package cz.falcon9.redact.backend.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -10,7 +11,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.admin.GetUsersResponse;
 import cz.falcon9.redact.backend.data.dtos.admin.UserCreationRequest;
-import cz.falcon9.redact.backend.data.dtos.admin.UserDto;
+import cz.falcon9.redact.backend.data.dtos.admin.UserDetail;
 import cz.falcon9.redact.backend.data.models.User;
+import cz.falcon9.redact.backend.data.models.UserRole;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.services.AdminService;
 
@@ -37,27 +38,35 @@ public class AdminController {
     @GetMapping("/users")
     public GetUsersResponse handleGetUsers() {
         List<User> users = adminService.getAllUsers();
-        List<UserDto> dtoUsers = new ArrayList<>();
+        List<UserDetail> dtoUsers = new ArrayList<>();
         
         for (User user : users) {
-            dtoUsers.add(UserDto.builder().withUserName(user.getUserName()).build());
+            dtoUsers.add(UserDetail.builder().withUserName(user.getUserName()).build());
         }
         
         return GetUsersResponse.builder().withUsers(dtoUsers).build();
     }
     
     @GetMapping("/user/{id}")
-    public String handleGetUserDetails(@PathVariable String userName) {
-        return "ITS OKAY MAJ BRUDA2";
+    public UserDetail handleGetUserDetails(@PathVariable String userName) {
+        User user = adminService.getUser(userName);
+        
+        return UserDetail.builder()
+                .withUserName(user.getUserName())
+                .withRoles(user.getRoles().stream().map(UserRole::getRole).collect(Collectors.toList()))
+                .build();
     }
     
     @PostMapping("/user/{id}")
     public void handleCreateUser(@RequestBody @Valid UserCreationRequest request) {
-    	
+        adminService.insertUser(User.builder()
+                .withUserName(request.getUserName())
+                .withPassword(request.getPassword())
+                .build());
     }
     
     @DeleteMapping("/user/{id}")
-    public void handleDeleteUser(@PathVariable String userName) throws MethodArgumentNotValidException {
+    public void handleDeleteUser(@PathVariable String userName) {
     	// Prevent admin cannot delete itself.
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     	
@@ -69,7 +78,7 @@ public class AdminController {
     	    }
     	}
     	
-    	//adminService.re
+    	adminService.deleteUser(userName);
     }
 
 }

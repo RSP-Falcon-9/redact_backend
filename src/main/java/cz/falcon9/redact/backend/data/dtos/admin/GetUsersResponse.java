@@ -7,14 +7,14 @@ import java.util.Collections;
 
 public class GetUsersResponse {
 
-    private List<UserDto> users;
+    private List<UserDetail> users;
 
     @Generated("SparkTools")
     private GetUsersResponse(Builder builder) {
         this.users = builder.users;
     }
     
-    public List<UserDto> getUsers() {
+    public List<UserDetail> getUsers() {
         return users;
     }
 
@@ -32,12 +32,12 @@ public class GetUsersResponse {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private List<UserDto> users = Collections.emptyList();
+        private List<UserDetail> users = Collections.emptyList();
 
         private Builder() {
         }
 
-        public Builder withUsers(List<UserDto> users) {
+        public Builder withUsers(List<UserDetail> users) {
             this.users = users;
             return this;
         }
