@@ -1,7 +1,5 @@
 package cz.falcon9.redact.backend.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -11,6 +9,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,15 +35,15 @@ public class AdminController {
     AdminService adminService;
     
     @GetMapping("/users")
+    @Transactional(readOnly = true)
     public GetUsersResponse handleGetUsers() {
-        List<User> users = adminService.getAllUsers();
-        List<UserDetail> dtoUsers = new ArrayList<>();
-        
-        for (User user : users) {
-            dtoUsers.add(UserDetail.builder().withUserName(user.getUserName()).build());
-        }
-        
-        return GetUsersResponse.builder().withUsers(dtoUsers).build();
+        return GetUsersResponse.builder()
+                .withUsers(adminService.getAllUsers().stream()
+                        .map(user -> UserDetail.builder().withUserName(user.getUserName())
+                                .withRoles(user.getRoles().stream().map(UserRole::getRole).collect(Collectors.toList()))
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
     
     @GetMapping("/user/{id}")

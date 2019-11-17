@@ -1,43 +1,71 @@
 package cz.falcon9.redact.backend.data.models;
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+import javax.annotation.Generated;
 
 @Entity
-@Table(name = "rsp_user_roles")
-public class UserRole implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@Table(name = "redact_user_roles")
+@IdClass(UserRoleCompositeId.class)
+public class UserRole {
     
+    /**
+     * Builder to build {@link UserRole}.
+     */
+    @Generated("SparkTools")
+    public static final class Builder {
+        private String username;
+        private String role;
+
+        private Builder() {
+        }
+
+        public UserRole build() {
+            return new UserRole(this);
+        }
+
+        public Builder withRole(String role) {
+            this.role = role;
+            return this;
+        }
+
+        public Builder withUsername(String username) {
+            this.username = username;
+            return this;
+        }
+    }
+
+    /**
+     * Creates builder to build {@link UserRole}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @Id 
+	private String username;
+
     @Id
-	@JoinColumn(name = "username", referencedColumnName = "username")
-	@ManyToOne
-	private User user;
+    private String role;
 
-	public User getUser() {
-		return user;
-	}
+    @Generated("SparkTools")
+    private UserRole(Builder builder) {
+        this.username = builder.username;
+        this.role = builder.role;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    private UserRole() { }
+    
+    public String getRole() {
+        return role;
+    }
 
-	@Id
-	@Column(name = "role", nullable = false)
-	private String role;
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
+    public String getUsername() {
+        return username;
+    }
 
 }
