@@ -41,6 +41,10 @@ public class AdminServiceImpl implements AdminService {
     		throw new InvalidArgumentException("Cannot insert user with blank name!");
     	}
     	
+        /*if (userRepository.existsById(user.getUserName())) {
+            throw new InvalidArgumentException(String.format("User %s already exists!", user.getUserName()));
+        }*/
+    	
     	userRepository.save(user);
     }
     

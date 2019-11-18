@@ -46,7 +46,7 @@ public class AdminController {
                 .build();
     }
     
-    @GetMapping("/user/{id}")
+    /*@GetMapping("/user/{id}")
     public UserDetail handleGetUserDetails(@PathVariable String userName) {
         User user = adminService.getUser(userName);
         
@@ -54,19 +54,35 @@ public class AdminController {
                 .withUserName(user.getUserName())
                 .withRoles(user.getRoles().stream().map(UserRole::getRole).collect(Collectors.toList()))
                 .build();
-    }
+    }*/
     
-    @PostMapping("/user/{id}")
-    public void handleCreateUser(@RequestBody @Valid UserCreationRequest request) {
+    @PostMapping("/user/{userName}")
+    public void handleCreateUser(@PathVariable String userName, @RequestBody @Valid UserCreationRequest request) {
+        // prevent admin overwrite
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            
+            if (currentUserName == userName) {
+                throw new InvalidArgumentException("Admin cannot overwrite himself!");
+            }
+        }
+        
+        // prevent admin overwrite
+        if (userName == "admin") {
+            throw new InvalidArgumentException("Admin account cannot be overwrited!");
+        }
+        
         adminService.insertUser(User.builder()
-                .withUserName(request.getUserName())
+                .withUserName(userName)
                 .withPassword(request.getPassword())
                 .build());
     }
-    
-    @DeleteMapping("/user/{id}")
+
+    @DeleteMapping("/user/{userName}")
     public void handleDeleteUser(@PathVariable String userName) {
-    	// Prevent admin cannot delete itself.
+    	// prevent self deletion
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     	
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -75,6 +91,11 @@ public class AdminController {
     	    if (currentUserName == userName) {
     	    	throw new InvalidArgumentException("Admin cannot delete himself!");
     	    }
+    	}
+    	
+    	// prevent admin deletion
+    	if (userName == "admin") {
+    	    throw new InvalidArgumentException("Admin account cannot be deleted!");
     	}
     	
     	adminService.deleteUser(userName);
