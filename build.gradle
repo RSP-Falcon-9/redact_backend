@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'eclipse'
-    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'org.springframework.boot' version '2.2.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'com.webcohesion.enunciate' version '2.12.1'
 }
@@ -11,16 +11,9 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
 def documentationFilesPath = "$buildDir/libs/docs";
-def generatedSourceFilesPath = "$projectDir/src/generated";
 
 repositories {
     mavenCentral()
-}
-
-sourceSets {
-    main {
-        java.srcDirs += generatedSourceFilesPath
-    }
 }
 
 test {
@@ -50,10 +43,6 @@ dependencies {
 
     // JUnit
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-    
-    // Immutables
-    annotationProcessor 'org.immutables:value:2.8.1'
-    compileOnly 'org.immutables:value-annotations:2.8.1'
 }
 
 // regenerate docs upon building
@@ -69,14 +58,3 @@ tasks.enunciate {
 }
 
 build.dependsOn enunciate
-
-// make generated source files appear in generated directory
-compileJava {
-    File generatedSourcesDir = file(generatedSourceFilesPath)
-    options.annotationProcessorGeneratedSourcesDirectory = file(generatedSourceFilesPath)
-    
-    doFirst {
-      generatedSourcesDir.deleteDir()
-      generatedSourcesDir.mkdirs()
-    }
-}
