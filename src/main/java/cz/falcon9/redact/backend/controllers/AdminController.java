@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.admin.GetUsersResponse;
 import cz.falcon9.redact.backend.data.dtos.admin.UserCreationRequest;
 import cz.falcon9.redact.backend.data.dtos.admin.UserDetail;
@@ -36,14 +37,14 @@ public class AdminController {
     
     @GetMapping("/users")
     @Transactional(readOnly = true)
-    public GetUsersResponse handleGetUsers() {
-        return GetUsersResponse.builder()
+    public BaseDto<GetUsersResponse> handleGetUsers() {
+        return new BaseDto<GetUsersResponse>(GetUsersResponse.builder()
                 .withUsers(adminService.getAllUsers().stream()
                         .map(user -> UserDetail.builder().withUserName(user.getUserName())
                                 .withRoles(user.getRoles().stream().map(UserRole::getRole).collect(Collectors.toList()))
                                 .build())
                         .collect(Collectors.toList()))
-                .build();
+                .build(), "Successfully fetched list!");
     }
     
     /*@GetMapping("/user/{id}")
@@ -57,7 +58,7 @@ public class AdminController {
     }*/
     
     @PostMapping("/user/{userName}")
-    public void handleCreateUser(@PathVariable String userName, @RequestBody @Valid UserCreationRequest request) {
+    public BaseDto<Void> handleCreateUser(@PathVariable String userName, @RequestBody @Valid UserCreationRequest request) {
         // prevent admin overwrite
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
@@ -77,11 +78,19 @@ public class AdminController {
         adminService.insertUser(User.builder()
                 .withUserName(userName)
                 .withPassword(request.getPassword())
+                .withRoles(request.getRoles().stream()
+                        .map(role -> UserRole.builder()
+                                .withUsername(userName)
+                                .withRole(role)
+                                .build())
+                        .collect(Collectors.toList()))
                 .build());
+        
+        return new BaseDto<Void>(String.format("Successfully created new user %s.", userName));
     }
 
     @DeleteMapping("/user/{userName}")
-    public void handleDeleteUser(@PathVariable String userName) {
+    public BaseDto<Void> handleDeleteUser(@PathVariable String userName) {
     	// prevent self deletion
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     	
@@ -99,6 +108,8 @@ public class AdminController {
     	}
     	
     	adminService.deleteUser(userName);
+    	
+    	return new BaseDto<Void>(String.format("Successfully deleted user %s.", userName));
     }
 
 }

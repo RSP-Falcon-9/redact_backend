@@ -6,7 +6,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.annotation.Generated;
@@ -23,8 +22,7 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "username")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="username")
     private List<UserRole> roles;
     
     @Generated("SparkTools")
