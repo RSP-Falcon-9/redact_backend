@@ -9,6 +9,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,9 @@ public class AdminController {
     
     @Autowired
     AdminService adminService;
+    
+    @Autowired
+    PasswordEncoder passwordEncoder;
     
     @GetMapping("/users")
     @Transactional(readOnly = true)
@@ -77,7 +81,7 @@ public class AdminController {
         
         adminService.insertUser(User.builder()
                 .withUserName(userName)
-                .withPassword(request.getPassword())
+                .withPassword(passwordEncoder.encode(request.getPassword()))
                 .withRoles(request.getRoles().stream()
                         .map(role -> UserRole.builder()
                                 .withUsername(userName)

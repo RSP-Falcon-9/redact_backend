@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,6 +36,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     RedactProperties redactProps;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -58,7 +67,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
-            .passwordEncoder(new BCryptPasswordEncoder())
+            .passwordEncoder(passwordEncoder)
             .dataSource(dataSource)
             .usersByUsernameQuery("SELECT username, password, 1 FROM redact_users WHERE username=?")
             .authoritiesByUsernameQuery("SELECT username, role FROM redact_user_roles WHERE username=?");
