@@ -10,7 +10,6 @@ public class AuthorArticleVersion {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private String articleId;
         private int version;
         private String fileName;
         private Date publishDate;
@@ -20,11 +19,6 @@ public class AuthorArticleVersion {
 
         public AuthorArticleVersion build() {
             return new AuthorArticleVersion(this);
-        }
-
-        public Builder withArticleId(String articleId) {
-            this.articleId = articleId;
-            return this;
         }
 
         public Builder withFileName(String fileName) {
@@ -51,25 +45,18 @@ public class AuthorArticleVersion {
     public static Builder builder() {
         return new Builder();
     }
-
-    private String articleId;
-
+    
     private int version;
 
     private String fileName;
-    
+   
     private Date publishDate;
-    
+
     @Generated("SparkTools")
     private AuthorArticleVersion(Builder builder) {
-        this.articleId = builder.articleId;
         this.version = builder.version;
         this.fileName = builder.fileName;
         this.publishDate = builder.publishDate;
-    }
-    
-    public String getArticleId() {
-        return articleId;
     }
 
     public String getFileName() {

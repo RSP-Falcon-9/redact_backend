@@ -7,42 +7,25 @@ import java.util.Collections;
 
 public class AuthorArticle {
 
-    private String name;
-    
-    private List<AuthorArticleVersion> versions;
-
-    @Generated("SparkTools")
-    private AuthorArticle(Builder builder) {
-        this.name = builder.name;
-        this.versions = builder.versions;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<AuthorArticleVersion> getVersions() {
-        return versions;
-    }
-
-    /**
-     * Creates builder to build {@link AuthorArticle}.
-     * @return created builder
-     */
-    @Generated("SparkTools")
-    public static Builder builder() {
-        return new Builder();
-    }
-
     /**
      * Builder to build {@link AuthorArticle}.
      */
     @Generated("SparkTools")
     public static final class Builder {
+        private String id;
         private String name;
         private List<AuthorArticleVersion> versions = Collections.emptyList();
 
         private Builder() {
+        }
+
+        public AuthorArticle build() {
+            return new AuthorArticle(this);
+        }
+
+        public Builder withId(String id) {
+            this.id = id;
+            return this;
         }
 
         public Builder withName(String name) {
@@ -54,10 +37,40 @@ public class AuthorArticle {
             this.versions = versions;
             return this;
         }
+    }
 
-        public AuthorArticle build() {
-            return new AuthorArticle(this);
-        }
+    /**
+     * Creates builder to build {@link AuthorArticle}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+    
+    private String id;
+    
+    private String name;
+
+    private List<AuthorArticleVersion> versions;
+
+    @Generated("SparkTools")
+    private AuthorArticle(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.versions = builder.versions;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<AuthorArticleVersion> getVersions() {
+        return versions;
     }
     
 }
