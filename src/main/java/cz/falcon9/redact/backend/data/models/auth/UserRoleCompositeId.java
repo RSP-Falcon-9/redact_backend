@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.data.models;
+package cz.falcon9.redact.backend.data.models.auth;
 
 import java.io.Serializable;
 

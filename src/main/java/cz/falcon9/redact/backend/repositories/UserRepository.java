@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import cz.falcon9.redact.backend.data.models.User;
+import cz.falcon9.redact.backend.data.models.auth.User;
 
 public interface UserRepository extends CrudRepository<User, String> {
     

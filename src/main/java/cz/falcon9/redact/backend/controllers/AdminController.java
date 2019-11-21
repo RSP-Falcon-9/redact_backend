@@ -23,8 +23,8 @@ import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.admin.GetUsersResponse;
 import cz.falcon9.redact.backend.data.dtos.admin.UserCreationRequest;
 import cz.falcon9.redact.backend.data.dtos.admin.UserDetail;
-import cz.falcon9.redact.backend.data.models.User;
-import cz.falcon9.redact.backend.data.models.UserRole;
+import cz.falcon9.redact.backend.data.models.auth.User;
+import cz.falcon9.redact.backend.data.models.auth.UserRole;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.services.AdminService;
 
