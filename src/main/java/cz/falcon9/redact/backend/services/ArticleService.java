@@ -9,6 +9,7 @@ import cz.falcon9.redact.backend.data.models.articles.Article;
 
 public interface ArticleService {
 
+    List<Article> getAllArticles();
     List<Article> getAllArticles(String authorId);
     Article insertNewArticle(String name, MultipartFile file);
     //Article insertNewArticleVersion();

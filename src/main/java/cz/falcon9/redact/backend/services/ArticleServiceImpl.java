@@ -47,6 +47,11 @@ public class ArticleServiceImpl implements ArticleService {
     UserRepository userRepo;
     
     @Override
+    public List<Article> getAllArticles() {
+        return articleRepo.findAll();
+    }
+    
+    @Override
     public List<Article> getAllArticles(String authorId) {
         return articleRepo.findAllByAuthor(authorId);
     }
