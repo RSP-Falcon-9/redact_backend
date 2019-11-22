@@ -3,8 +3,6 @@ package cz.falcon9.redact.backend.controllers;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -91,11 +89,6 @@ public class AuthorController {
                 .withName(article.getName())
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
-    }
-    
-    @GetMapping(value = "/article/{id}/{version}/file", produces = MediaType.APPLICATION_PDF_VALUE )
-    public FileSystemResource handleGetArticleFile(@PathVariable String id, @PathVariable Integer version) {
-        return articleService.getArticleFile(id, version);
     }
     
 }
