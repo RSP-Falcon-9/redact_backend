@@ -6,19 +6,19 @@ public class ArticleVersionCompositeId implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private String article_id;
+    private String articleId;
 
     private Integer version;
 
     ArticleVersionCompositeId() {}
 
     public ArticleVersionCompositeId(String article_id, Integer version) {
-        this.article_id = article_id;
+        this.articleId = article_id;
         this.version = version;
     }
 
     public String getArticle_id() {
-        return article_id;
+        return articleId;
     }
     
     public Integer getVersion() {

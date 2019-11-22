@@ -75,6 +75,8 @@ public class ArticleVersion {
     @Column(name = "publish_date", nullable = false)
     private Date publishDate;
     
+    private ArticleVersion() { }
+    
     @Generated("SparkTools")
     private ArticleVersion(Builder builder) {
         this.articleId = builder.articleId;

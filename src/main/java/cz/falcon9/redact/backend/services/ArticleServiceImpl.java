@@ -12,19 +12,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import cz.falcon9.redact.backend.data.dtos.author.CreateArticleRequest;
 import cz.falcon9.redact.backend.data.models.articles.Article;
 import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
 import cz.falcon9.redact.backend.data.models.auth.User;
 import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
-import cz.falcon9.redact.backend.exceptions.ForbiddenException;
+//import cz.falcon9.redact.backend.exceptions.ForbiddenException;
 import cz.falcon9.redact.backend.exceptions.InternalException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.properties.RedactProperties;
@@ -32,9 +33,10 @@ import cz.falcon9.redact.backend.repositories.ArticleRepository;
 import cz.falcon9.redact.backend.repositories.UserRepository;
 
 @Service
-@Secured("ROLE_AUTHOR")
 public class ArticleServiceImpl implements ArticleService {
 
+    private final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
+    
     @Autowired
     RedactProperties redactProps;
     
@@ -50,12 +52,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
     
     @Override
-    public Article insertArticle(CreateArticleRequest request) {
+    public Article insertNewArticle(String name, MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> user = userRepo.findById(authentication.getName());
         
         if (!user.isPresent()) {
-            // TODO: Log
+            log.debug("User is not present in repo, but in auth is: {}", authentication.getName());
+            
             throw new InvalidArgumentException(String.format("User %s is not valid!", authentication.getName()));
         }
 
@@ -71,43 +74,59 @@ public class ArticleServiceImpl implements ArticleService {
                 .build());
         
         Article article = Article.builder()
-                .withId(UUID.randomUUID().toString())
-                .withName(request.getName())
+                .withId(articleId)
+                .withName(name)
                 .withUser(user.get())
                 .withVersions(versions)
                 .build();
-        
-        articleRepo.save(article);
-        
-        try (InputStream is = request.getFile().getInputStream()) {
-            byte[] buffer = new byte[is.available()]; 
-            File f = new File(redactProps.getArticlesDir().concat(File.separator).concat(fileName));
-            OutputStream os = new FileOutputStream(f);
 
+        try (InputStream is = file.getInputStream()) {
+            // create folder if it doesn't exist
+            File dir = new File(redactProps.getArticlesDir());
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            
+            byte[] buffer = new byte[is.available()]; 
+            File f = new File(dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            OutputStream os = new FileOutputStream(f);
+            
+            log.debug("Testing file output dir: {}", dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            
             is.read(buffer);
             os.write(buffer);
             os.close();
-        } catch (IOException ex) {
-            //log.error("IOException caught: {}", ex);
-            
-            throw new InternalException(String.format("Cannot upload file with name %s!", request.getFile().getOriginalFilename()));
+        } catch (IOException ex) {  
+            throw new InternalException(String.format("Cannot upload file with name %s!", file.getOriginalFilename()));
         }
         
+        articleRepo.save(article);
+        
         return article;
+    }
+    
+    @Override
+    public Article getArticle(String articleId) {
+        Optional<Article> optionalArticle = articleRepo.findById(articleId);
+        if (!optionalArticle.isPresent()) {
+            throw new ArgumentNotFoundException(String.format("Article %s does not exist.", articleId));
+        }
+        
+        return optionalArticle.get();
     }
     
     @Override
     public FileSystemResource getArticleFile(String articleId, Integer version) {
         Optional<Article> optionalArticle = articleRepo.findById(articleId);
         if (!optionalArticle.isPresent()) {
-            throw new ArgumentNotFoundException(String.format("Image %s does not exist.", articleId));
+            throw new ArgumentNotFoundException(String.format("No file for article %s exists.", articleId));
         }
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Article article = optionalArticle.get();
-        if (article.getUser().getUserName() != authentication.getName()) {
+        /*if (article.getUser().getUserName() != authentication.getName()) {
             throw new ForbiddenException("You don't have access to this article!");
-        }
+        }*/
         
         File articleFile = new File(redactProps.getArticlesDir().concat(File.separator)
                 .concat(articleId).concat("_").concat(version.toString()).concat(".pdf"));
@@ -117,5 +136,5 @@ public class ArticleServiceImpl implements ArticleService {
 
         return new FileSystemResource(articleFile);
     }
-
+    
 }

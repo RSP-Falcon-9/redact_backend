@@ -76,9 +76,11 @@ public class Article {
     @JoinColumn(name="author_id", nullable=false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="id")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="articleId")
     private List<ArticleVersion> versions;
 
+    private Article() { }
+    
     @Generated("SparkTools")
     private Article(Builder builder) {
         this.id = builder.id;

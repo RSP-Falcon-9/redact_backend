@@ -2,10 +2,9 @@ package cz.falcon9.redact.backend.controllers;
 
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,16 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticle;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleVersion;
-import cz.falcon9.redact.backend.data.dtos.author.CreateArticleRequest;
+import cz.falcon9.redact.backend.data.dtos.author.GetArticleDetail;
 import cz.falcon9.redact.backend.data.dtos.author.GetAuthorArticlesResponse;
 import cz.falcon9.redact.backend.data.models.articles.Article;
+import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.services.ArticleService;
 
 @RestController
@@ -59,8 +60,14 @@ public class AuthorController {
     }
     
     @PostMapping("/article")
-    public BaseDto<AuthorArticle> handleCreateArcticle(@RequestBody @Valid CreateArticleRequest request) {
-        Article article = articleService.insertArticle(request);
+    public BaseDto<AuthorArticle> handleCreateArcticle(@RequestParam(value = "name") String name,
+            @RequestParam(value = "file") MultipartFile file) {
+        String[] fileNameParts = file.getOriginalFilename().split("\\.");
+        if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
+            throw new InvalidArgumentException("Only .pdf files are supported!");
+        }
+        
+        Article article = articleService.insertNewArticle(name, file);
 
         return new BaseDto<AuthorArticle>(AuthorArticle.builder()
                 .withId(article.getId())
@@ -76,10 +83,19 @@ public class AuthorController {
                 String.format("Successfully created article with id %s.", article.getId()));
     }
     
-    @PostMapping("/article/{id}/{version}/file")
-    public BaseDto<FileSystemResource> handleGetArticleFile(@PathVariable String id, @PathVariable Integer version) {
-        return new BaseDto<FileSystemResource>(articleService.getArticleFile(id, version),
-                String.format("Successfully got article file for article id with %s and version %s.", id, version));
+    @GetMapping("/article/{id}/{version}")
+    public BaseDto<GetArticleDetail> handleGetArticleDetail(@PathVariable String id, @PathVariable Integer version) {
+        Article article = articleService.getArticle(id);
+        
+        return new BaseDto<GetArticleDetail>(GetArticleDetail.builder()
+                .withName(article.getName())
+                .build(),
+                String.format("Successfully got article with id %s and version %s.", id, version));
+    }
+    
+    @GetMapping(value = "/article/{id}/{version}/file", produces = MediaType.APPLICATION_PDF_VALUE )
+    public FileSystemResource handleGetArticleFile(@PathVariable String id, @PathVariable Integer version) {
+        return articleService.getArticleFile(id, version);
     }
     
 }
