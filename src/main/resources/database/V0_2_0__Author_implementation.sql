@@ -9,7 +9,7 @@ CREATE TABLE `redact_article` (
   `name` VARCHAR(255) NOT NULL,
   `author_id` VARCHAR(36) NOT NULL,
   PRIMARY KEY (`id`),
-    CONSTRAINT `fk_author_id` FOREIGN KEY (`author_id`) REFERENCES `redact_users`(`username`) ON DELETE CASCADE
+  CONSTRAINT `fk_author_id` FOREIGN KEY (`author_id`) REFERENCES `redact_users`(`username`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `redact_arcticle_version` (
@@ -23,6 +23,7 @@ CREATE TABLE `redact_arcticle_version` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `redact_article_review` (
+  `id` VARCHAR(36) NOT NULL,
   `article_id` VARCHAR(36) NOT NULL,
   `version` TINYINT NOT NULL,
   `review_status` TINYINT NOT NULL,
@@ -34,7 +35,6 @@ CREATE TABLE `redact_article_review` (
   `comment` TEXT,
   `review_date` DATE,
   `visible_to_author` BOOLEAN NOT NULL,
-  PRIMARY KEY (`article_id`, `version`),
-  CONSTRAINT `fk_review_article_id` FOREIGN KEY (`article_id`) REFERENCES `redact_article`(`id`) ON DELETE CASCADE,
+  PRIMARY KEY (`id`),
   CONSTRAINT `fk_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `redact_users`(`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

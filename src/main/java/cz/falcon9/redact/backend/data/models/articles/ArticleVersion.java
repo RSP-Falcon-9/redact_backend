@@ -8,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -38,7 +40,15 @@ public class ArticleVersion {
     @Column(columnDefinition = "TINYINT")
     private ArticleStatus status;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "version")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumns({
+        @JoinColumn(
+            name = "article_id",
+            referencedColumnName = "article_id"),
+        @JoinColumn(
+            name = "version",
+            referencedColumnName = "version")
+    })
     private List<ArticleReview> reviews;
 
     @Generated("SparkTools")

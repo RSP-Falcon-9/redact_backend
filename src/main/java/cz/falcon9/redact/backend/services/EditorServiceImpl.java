@@ -1,8 +1,11 @@
 package cz.falcon9.redact.backend.services;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
@@ -14,6 +17,7 @@ import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.repositories.UserRepository;
 
+@Service
 public class EditorServiceImpl implements EditorService {
 
     @Autowired
@@ -22,6 +26,11 @@ public class EditorServiceImpl implements EditorService {
     @Autowired
     UserRepository userRepo;
 
+    @Override
+    public List<User> getReviewers() {
+        return userRepo.findByRole("ROLE_REVIEWER");
+    }
+    
     @Override
     @Transactional
     public void assignReviewerToArticle(String articleId, Integer version, String reviewerId) {
@@ -44,6 +53,7 @@ public class EditorServiceImpl implements EditorService {
         }
         
         articleVersion.getReviews().add(ArticleReview.builder()
+                .withId(UUID.randomUUID().toString())
                 .withArticleId(articleId)
                 .withVersion(version)
                 .withReviewStatus(ArticleReviewStatus.NEW)

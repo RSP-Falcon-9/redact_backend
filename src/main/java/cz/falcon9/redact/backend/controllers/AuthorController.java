@@ -17,10 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticle;
+import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleReview;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleVersion;
-import cz.falcon9.redact.backend.data.dtos.author.GetArticleDetail;
+import cz.falcon9.redact.backend.data.dtos.author.GetAuthorArticleDetail;
 import cz.falcon9.redact.backend.data.dtos.author.GetAuthorArticlesResponse;
 import cz.falcon9.redact.backend.data.models.articles.Article;
+import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
+import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.services.ArticleService;
 
@@ -59,7 +62,7 @@ public class AuthorController {
     }
     
     @PostMapping("/article")
-    public BaseDto<AuthorArticle> handleCreateArcticle(@RequestParam(value = "name") String name,
+    public BaseDto<AuthorArticle> handleCreateArticle(@RequestParam(value = "name") String name,
             @RequestParam(value = "file") MultipartFile file) {
         String[] fileNameParts = file.getOriginalFilename().split("\\.");
         if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
@@ -83,12 +86,51 @@ public class AuthorController {
                 String.format("Successfully created article with id %s.", article.getId()));
     }
     
-    @GetMapping("/article/{id}/{version}")
-    public BaseDto<GetArticleDetail> handleGetArticleDetail(@PathVariable String id, @PathVariable Integer version) {
-        Article article = articleService.getArticle(id);
+    @PostMapping("/article/{id}")
+    public BaseDto<AuthorArticle> handleAddArticleVersion(@PathVariable String id,
+            @RequestParam(value = "file") MultipartFile file) {
+        String[] fileNameParts = file.getOriginalFilename().split("\\.");
+        if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
+            throw new InvalidArgumentException("Only .pdf files are supported!");
+        }
         
-        return new BaseDto<GetArticleDetail>(GetArticleDetail.builder()
+        Article article = articleService.insertNewArticleVersion(id, file);
+
+        return new BaseDto<AuthorArticle>(AuthorArticle.builder()
+                .withId(article.getId())
                 .withName(article.getName())
+                .withVersions(article.getVersions().stream()
+                        .map(articleVersion -> AuthorArticleVersion.builder()
+                                .withVersion(articleVersion.getVersion())
+                                .withFileName(articleVersion.getFileName())
+                                .withPublishDate(articleVersion.getPublishDate())
+                                .withStatus(articleVersion.getStatus())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build(),
+                String.format("Successfully updated article with id %s.", article.getId()));
+    }
+    
+    @GetMapping("/article/{id}/{version}")
+    public BaseDto<GetAuthorArticleDetail> handleGetArticleDetail(@PathVariable String id, @PathVariable Integer version) {
+        Article article = articleService.getArticle(id);
+        ArticleVersion articleVersion = article.getVersion(version);
+        if (articleVersion == null) {
+            throw new ArgumentNotFoundException(String.format("Cannot find specified version %s for article %s!", version, id));
+        }
+        
+        return new BaseDto<GetAuthorArticleDetail>(GetAuthorArticleDetail.builder()
+                .withName(article.getName())
+                .withReviews(articleVersion.getReviews().stream()
+                        .map(articleRev -> AuthorArticleReview.builder()
+                                .withId(articleRev.getId())
+                                .withInterest(articleRev.getInterest())
+                                .withOriginality(articleRev.getOriginality())
+                                .withSpecializationLevel(articleRev.getSpecializationLevel())
+                                .withLanguageLevel(articleRev.getLanguageLevel())
+                                .withComment(articleRev.getComment())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
     }

@@ -4,21 +4,25 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleVersion;
 import cz.falcon9.redact.backend.data.dtos.editor.EditorArticle;
 import cz.falcon9.redact.backend.data.dtos.editor.GetEditorArticlesResponse;
+import cz.falcon9.redact.backend.data.dtos.editor.GetReviewersResponse;
+import cz.falcon9.redact.backend.data.dtos.editor.Reviewer;
 import cz.falcon9.redact.backend.services.ArticleService;
 import cz.falcon9.redact.backend.services.EditorService;
 
-@Service
+@RestController
+@RequestMapping("/editor")
 @Secured("ROLE_EDITOR")
 public class EditorController {
 
@@ -58,6 +62,16 @@ public class EditorController {
         
         return new BaseDto<Void>(String.format("Successfully denied article %s and version %s with reason %s.", articleId, version, reason));
     }*/
+    
+    @GetMapping("/reviewers")
+    public BaseDto<GetReviewersResponse> handleGetReviewersResponse() {
+        return new BaseDto<GetReviewersResponse>(GetReviewersResponse.builder()
+                .withReviewers(editorServ.getReviewers().stream().map(user -> Reviewer.builder()
+                        .withUserName(user.getUserName())
+                        .build())
+                        .collect(Collectors.toList()))
+                .build(), "Successfully get all reviewers.");
+    }
     
     @PostMapping("/review/{articleId}/{version}")
     public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version, @RequestParam("reviewerId") String reviewerId) {

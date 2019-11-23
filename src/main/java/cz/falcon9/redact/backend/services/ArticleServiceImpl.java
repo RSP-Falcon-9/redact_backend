@@ -123,6 +123,59 @@ public class ArticleServiceImpl implements ArticleService {
     }
     
     @Override
+    public Article insertNewArticleVersion(String id, MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> user = userRepo.findById(authentication.getName());
+        
+        if (!user.isPresent()) {
+            log.debug("User is not present in repo, but in auth is: {}", authentication.getName());
+            
+            throw new InvalidArgumentException(String.format("User %s is not valid!", authentication.getName()));
+        }
+
+        Optional<Article> optionalArticle = articleRepo.findById(id);
+        if (!optionalArticle.isPresent()) {
+            throw new ArgumentNotFoundException(String.format("Article %s doesn't exist!", authentication.getName()));
+        }
+        
+        Article article = optionalArticle.get();
+        ArticleVersion articleVersion = article.getLatestVersion();
+        String fileName = id.concat("_").concat(String.valueOf(articleVersion.getVersion() + 1)).concat(".pdf");
+        
+        article.getVersions().add(ArticleVersion.builder()
+                .withArticleId(id)
+                .withFileName(fileName)
+                .withVersion(0)
+                .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
+                .withStatus(ArticleStatus.NEW)
+                .build());
+
+        try (InputStream is = file.getInputStream()) {
+            // create folder if it doesn't exist
+            File dir = new File(redactProps.getArticlesDir());
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            
+            byte[] buffer = new byte[is.available()]; 
+            File f = new File(dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            OutputStream os = new FileOutputStream(f);
+            
+            log.debug("Testing file output dir: {}", dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            
+            is.read(buffer);
+            os.write(buffer);
+            os.close();
+        } catch (IOException ex) {  
+            throw new InternalException(String.format("Cannot upload file with name %s!", file.getOriginalFilename()));
+        }
+        
+        articleRepo.save(article);
+        
+        return article;
+    }
+    
+    @Override
     public Article getArticle(String articleId) {
         Optional<Article> optionalArticle = articleRepo.findById(articleId);
         if (!optionalArticle.isPresent()) {

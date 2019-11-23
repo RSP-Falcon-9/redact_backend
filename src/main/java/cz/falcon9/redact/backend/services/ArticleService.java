@@ -14,6 +14,7 @@ public interface ArticleService {
     List<Article> getNewArticles();
     List<Article> getAllArticlesForReviewer(String reviewerId);
     Article insertNewArticle(String name, MultipartFile file);
+    Article insertNewArticleVersion(String id, MultipartFile file);
     //Article insertNewArticleVersion();
     Article getArticle(String articleId);
     FileSystemResource getArticleFile(String articleId, Integer version);

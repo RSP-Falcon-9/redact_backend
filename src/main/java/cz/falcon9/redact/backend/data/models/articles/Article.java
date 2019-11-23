@@ -1,6 +1,7 @@
 package cz.falcon9.redact.backend.data.models.articles;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
 import cz.falcon9.redact.backend.data.models.auth.User;
 import javax.annotation.Generated;
 import java.util.Collections;
+import java.util.Comparator;
 
 @Entity
 @Table(name = "redact_article")
@@ -56,6 +58,20 @@ public class Article {
 
     public List<ArticleVersion> getVersions() {
         return versions;
+    }
+    
+    public ArticleVersion getVersion(Integer version) {
+        Optional<ArticleVersion> optionalVersion = versions.stream().filter(ver -> ver.getVersion() == version).findFirst();
+        
+        if (!optionalVersion.isPresent()) {
+            return null;
+        }
+        
+        return optionalVersion.get();
+    }
+    
+    public ArticleVersion getLatestVersion() {
+        return versions.stream().max(Comparator.comparingInt(ArticleVersion::getVersion)).get();
     }
 
     /**

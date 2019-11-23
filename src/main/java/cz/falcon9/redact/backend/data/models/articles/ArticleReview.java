@@ -16,7 +16,6 @@ import javax.annotation.Generated;
 
 @Entity
 @Table(name = "redact_article_review")
-@IdClass(ArticleVersionCompositeId.class)
 public class ArticleReview {
     
     /**
@@ -24,6 +23,7 @@ public class ArticleReview {
      */
     @Generated("SparkTools")
     public static final class Builder {
+        private String id;
         private String articleId;
         private int version;
         private ArticleReviewStatus reviewStatus;
@@ -50,6 +50,11 @@ public class ArticleReview {
 
         public Builder withComment(String comment) {
             this.comment = comment;
+            return this;
+        }
+
+        public Builder withId(String id) {
+            this.id = id;
             return this;
         }
 
@@ -107,16 +112,17 @@ public class ArticleReview {
     public static Builder builder() {
         return new Builder();
     }
-
+    
     @Id
+    @Column()
+    private String id;
+
     @Column(name = "article_id")
     private String articleId;
 
-    @Id
     @Column(columnDefinition = "TINYINT")
     private int version;
 
-    @Id
     @Column(name="review_status", columnDefinition = "TINYINT")
     private ArticleReviewStatus reviewStatus;
 
@@ -147,6 +153,7 @@ public class ArticleReview {
     
     @Generated("SparkTools")
     private ArticleReview(Builder builder) {
+        this.id = builder.id;
         this.articleId = builder.articleId;
         this.version = builder.version;
         this.reviewStatus = builder.reviewStatus;
@@ -159,13 +166,17 @@ public class ArticleReview {
         this.reviewDate = builder.reviewDate;
         this.visibleToAuthor = builder.visibleToAuthor;
     }
-
+    
     public String getArticleId() {
         return articleId;
     }
     
     public String getComment() {
         return comment;
+    }
+    
+    public String getId() {
+        return id;
     }
     
     public int getInterest() {
@@ -175,11 +186,11 @@ public class ArticleReview {
     public int getLanguageLevel() {
         return languageLevel;
     }
-    
+
     public int getOriginality() {
         return originality;
     }
-    
+
     public Date getReviewDate() {
         return reviewDate;
     }

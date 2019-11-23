@@ -28,7 +28,7 @@ public class ReviewerController {
     @Autowired
     ArticleService articleServ;
     
-    @GetMapping("/reviews")
+    @GetMapping("/articles")
     public BaseDto<GetReviewerArticlesResponse> handleGetPendingReviews() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = authentication.getName();
