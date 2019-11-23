@@ -19,6 +19,54 @@ import java.util.Collections;
 @Table(name = "redact_article")
 public class Article {
     
+    @Id
+    private String id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+    
+    @ManyToOne
+    @JoinColumn(name="author_id", nullable=false)
+    private User user;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="articleId")
+    private List<ArticleVersion> versions;
+
+    @Generated("SparkTools")
+    private Article(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.user = builder.user;
+        this.versions = builder.versions;
+    }
+
+    private Article() { }
+    
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public List<ArticleVersion> getVersions() {
+        return versions;
+    }
+
+    /**
+     * Creates builder to build {@link Article}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /**
      * Builder to build {@link Article}.
      */
@@ -30,10 +78,6 @@ public class Article {
         private List<ArticleVersion> versions = Collections.emptyList();
 
         private Builder() {
-        }
-
-        public Article build() {
-            return new Article(this);
         }
 
         public Builder withId(String id) {
@@ -55,54 +99,10 @@ public class Article {
             this.versions = versions;
             return this;
         }
-    }
 
-    /**
-     * Creates builder to build {@link Article}.
-     * @return created builder
-     */
-    @Generated("SparkTools")
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    @Id
-    private String id;
-
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
-    private User user;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="articleId")
-    private List<ArticleVersion> versions;
-
-    private Article() { }
-    
-    @Generated("SparkTools")
-    private Article(Builder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-        this.user = builder.user;
-        this.versions = builder.versions;
-    }
-    
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public List<ArticleVersion> getVersions() {
-        return versions;
+        public Article build() {
+            return new Article(this);
+        }
     }
     
 }

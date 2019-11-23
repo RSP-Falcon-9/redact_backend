@@ -15,5 +15,11 @@ public interface ArticleRepository extends CrudRepository<Article, String> {
     @Query("SELECT a FROM Article a WHERE a.user.userName = :authorId")
     List<Article> findAllByAuthor(@Param("authorId") String authorId);
     
+    @Query("SELECT a FROM Article a JOIN a.versions v WHERE v.status = cz.falcon9.redact.backend.data.articles.ArticleStatus.NEW")
+    List<Article> findNew();
+    
+    @Query("SELECT a FROM Article a JOIN a.versions v JOIN v.reviews r WHERE r.reviewer.userName = :reviewerId")
+    List<Article> findByReviewer(@Param("reviewerId") String reviewerId);
+    
 }
 

@@ -49,6 +49,7 @@ public class AuthorController {
                                                         .withVersion(articleVersion.getVersion())
                                                         .withFileName(articleVersion.getFileName())
                                                         .withPublishDate(articleVersion.getPublishDate())
+                                                        .withStatus(articleVersion.getStatus())
                                                         .build())
                                                 .collect(Collectors.toList()))
                                         .build())
@@ -75,6 +76,7 @@ public class AuthorController {
                                 .withVersion(articleVersion.getVersion())
                                 .withFileName(articleVersion.getFileName())
                                 .withPublishDate(articleVersion.getPublishDate())
+                                .withStatus(articleVersion.getStatus())
                                 .build())
                         .collect(Collectors.toList()))
                 .build(),

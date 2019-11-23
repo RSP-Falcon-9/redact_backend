@@ -11,9 +11,12 @@ public interface ArticleService {
 
     List<Article> getAllArticles();
     List<Article> getAllArticles(String authorId);
+    List<Article> getNewArticles();
+    List<Article> getAllArticlesForReviewer(String reviewerId);
     Article insertNewArticle(String name, MultipartFile file);
     //Article insertNewArticleVersion();
     Article getArticle(String articleId);
     FileSystemResource getArticleFile(String articleId, Integer version);
+    void updateArticle(Article article);
     
 }

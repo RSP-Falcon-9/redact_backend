@@ -1,17 +1,19 @@
-package cz.falcon9.redact.backend.data.dtos.author;
+package cz.falcon9.redact.backend.data.dtos.reviewer;
 
 import java.sql.Date;
-import javax.annotation.Generated;
 
 import cz.falcon9.redact.backend.data.articles.ArticleStatus;
+import javax.annotation.Generated;
 
-public class AuthorArticleVersion {
-
+public class ReviewerArticle {
+    
     /**
-     * Builder to build {@link AuthorArticleVersion}.
+     * Builder to build {@link ReviewerArticle}.
      */
     @Generated("SparkTools")
     public static final class Builder {
+        private String id;
+        private String name;
         private int version;
         private String fileName;
         private Date publishDate;
@@ -20,12 +22,22 @@ public class AuthorArticleVersion {
         private Builder() {
         }
 
-        public AuthorArticleVersion build() {
-            return new AuthorArticleVersion(this);
+        public ReviewerArticle build() {
+            return new ReviewerArticle(this);
         }
 
         public Builder withFileName(String fileName) {
             this.fileName = fileName;
+            return this;
+        }
+
+        public Builder withId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
             return this;
         }
 
@@ -46,16 +58,20 @@ public class AuthorArticleVersion {
     }
 
     /**
-     * Creates builder to build {@link AuthorArticleVersion}.
+     * Creates builder to build {@link ReviewerArticle}.
      * @return created builder
      */
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
-   
-    private int version;
     
+    private String id;
+    
+    private String name;
+
+    private int version;
+
     private String fileName;
 
     private Date publishDate;
@@ -63,7 +79,9 @@ public class AuthorArticleVersion {
     private ArticleStatus status;
 
     @Generated("SparkTools")
-    private AuthorArticleVersion(Builder builder) {
+    private ReviewerArticle(Builder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
         this.version = builder.version;
         this.fileName = builder.fileName;
         this.publishDate = builder.publishDate;
@@ -72,6 +90,14 @@ public class AuthorArticleVersion {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Date getPublishDate() {

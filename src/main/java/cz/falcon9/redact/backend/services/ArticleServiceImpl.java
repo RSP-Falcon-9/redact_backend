@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import cz.falcon9.redact.backend.data.articles.ArticleStatus;
 import cz.falcon9.redact.backend.data.models.articles.Article;
 import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
 import cz.falcon9.redact.backend.data.models.auth.User;
@@ -55,6 +56,16 @@ public class ArticleServiceImpl implements ArticleService {
     public List<Article> getAllArticles(String authorId) {
         return articleRepo.findAllByAuthor(authorId);
     }
+   
+    @Override
+    public List<Article> getNewArticles() {
+        return articleRepo.findNew();
+    }
+    
+    @Override
+    public List<Article> getAllArticlesForReviewer(String reviewerId) {
+        return articleRepo.findByReviewer(reviewerId);
+    }
     
     @Override
     public Article insertNewArticle(String name, MultipartFile file) {
@@ -76,6 +87,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .withFileName(fileName)
                 .withVersion(0)
                 .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
+                .withStatus(ArticleStatus.NEW)
                 .build());
         
         Article article = Article.builder()
@@ -140,6 +152,11 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         return new FileSystemResource(articleFile);
+    }
+    
+    @Override
+    public void updateArticle(Article article) {
+        articleRepo.save(article);
     }
     
 }
