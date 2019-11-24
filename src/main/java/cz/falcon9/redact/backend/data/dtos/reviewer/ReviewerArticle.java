@@ -2,7 +2,7 @@ package cz.falcon9.redact.backend.data.dtos.reviewer;
 
 import java.sql.Date;
 
-import cz.falcon9.redact.backend.data.articles.ArticleStatus;
+import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
 import javax.annotation.Generated;
 
 public class ReviewerArticle {
@@ -17,7 +17,7 @@ public class ReviewerArticle {
         private int version;
         private String fileName;
         private Date publishDate;
-        private ArticleStatus status;
+        private ArticleReviewStatus reviewStatus;
 
         private Builder() {
         }
@@ -46,8 +46,8 @@ public class ReviewerArticle {
             return this;
         }
 
-        public Builder withStatus(ArticleStatus status) {
-            this.status = status;
+        public Builder withStatus(ArticleReviewStatus reviewStatus) {
+            this.reviewStatus = reviewStatus;
             return this;
         }
 
@@ -76,7 +76,7 @@ public class ReviewerArticle {
 
     private Date publishDate;
 
-    private ArticleStatus status;
+    private ArticleReviewStatus reviewStatus;
 
     @Generated("SparkTools")
     private ReviewerArticle(Builder builder) {
@@ -85,7 +85,7 @@ public class ReviewerArticle {
         this.version = builder.version;
         this.fileName = builder.fileName;
         this.publishDate = builder.publishDate;
-        this.status = builder.status;
+        this.reviewStatus = builder.reviewStatus;
     }
 
     public String getFileName() {
@@ -104,8 +104,8 @@ public class ReviewerArticle {
         return publishDate;
     }
 
-    public ArticleStatus getStatus() {
-        return status;
+    public ArticleReviewStatus getStatus() {
+        return reviewStatus;
     }
 
     public int getVersion() {

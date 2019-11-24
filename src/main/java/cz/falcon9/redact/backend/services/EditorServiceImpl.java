@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ import cz.falcon9.redact.backend.repositories.UserRepository;
 @Service
 public class EditorServiceImpl implements EditorService {
 
+    private final Logger log = LoggerFactory.getLogger(EditorServiceImpl.class);
+    
     @Autowired
     ArticleService articleServ;
     
@@ -42,14 +46,16 @@ public class EditorServiceImpl implements EditorService {
         }
         
         Optional<User> optionalReviewer = userRepo.findById(reviewerId);
-        if (optionalReviewer.isPresent()) {
+        if (!optionalReviewer.isPresent()) {
             throw new ArgumentNotFoundException(String.format("Cannot find reviewer with id %s.", reviewerId));
         }
         
         ArticleVersion articleVersion = optionalArticleVersion.get();
-        Optional<ArticleReview> optionalArticleReview = articleVersion.getReviews().stream().filter(articleVer -> articleVer.getReviewer().getUserName() == reviewerId).findFirst();
+        Optional<ArticleReview> optionalArticleReview = articleVersion.getReviews().stream().filter(articleRev ->
+            articleRev.getReviewer().getUserName().equals(reviewerId)).findFirst();
         if (optionalArticleReview.isPresent()) {
-            throw new InvalidArgumentException(String.format("Reviewer %s already reviewed this article %s and version %s.", reviewerId, articleId, version));
+            throw new InvalidArgumentException(String.format("Reviewer %s was already assigned for this article %s and version %s.",
+                    reviewerId, articleId, version));
         }
         
         articleVersion.getReviews().add(ArticleReview.builder()

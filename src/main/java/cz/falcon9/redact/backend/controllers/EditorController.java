@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
@@ -18,6 +18,7 @@ import cz.falcon9.redact.backend.data.dtos.editor.EditorArticle;
 import cz.falcon9.redact.backend.data.dtos.editor.GetEditorArticlesResponse;
 import cz.falcon9.redact.backend.data.dtos.editor.GetReviewersResponse;
 import cz.falcon9.redact.backend.data.dtos.editor.Reviewer;
+import cz.falcon9.redact.backend.data.dtos.editor.SetReviewerToArticleRequest;
 import cz.falcon9.redact.backend.services.ArticleService;
 import cz.falcon9.redact.backend.services.EditorService;
 
@@ -74,10 +75,12 @@ public class EditorController {
     }
     
     @PostMapping("/review/{articleId}/{version}")
-    public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version, @RequestParam("reviewerId") String reviewerId) {
-        editorServ.assignReviewerToArticle(articleId, version, reviewerId);
+    public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version,
+            @RequestBody SetReviewerToArticleRequest request) {
+        editorServ.assignReviewerToArticle(articleId, version, request.getReviewerId());
         
-        return new BaseDto<Void>(String.format("Successfully set reviewer %s to article %s and version %s.", reviewerId, articleId, version));
+        return new BaseDto<Void>(String.format("Successfully set reviewer %s to article %s and version %s.", 
+                request.getReviewerId(), articleId, version));
     }
     
     /*@PostMapping("/accept/{articleId}/{version}")
