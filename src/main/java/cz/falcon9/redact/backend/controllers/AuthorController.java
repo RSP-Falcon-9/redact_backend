@@ -87,6 +87,7 @@ public class AuthorController {
     }
     
     @PostMapping("/article/{id}")
+    @Transactional
     public BaseDto<AuthorArticle> handleAddArticleVersion(@PathVariable String id,
             @RequestParam(value = "file") MultipartFile file) {
         String[] fileNameParts = file.getOriginalFilename().split("\\.");
@@ -112,6 +113,7 @@ public class AuthorController {
     }
     
     @GetMapping("/article/{id}/{version}")
+    @Transactional
     public BaseDto<GetAuthorArticleDetail> handleGetArticleDetail(@PathVariable String id, @PathVariable Integer version) {
         Article article = articleService.getArticle(id);
         ArticleVersion articleVersion = article.getVersion(version);
@@ -124,6 +126,7 @@ public class AuthorController {
                 .withReviews(articleVersion.getReviews().stream()
                         .map(articleRev -> AuthorArticleReview.builder()
                                 .withId(articleRev.getId())
+                                .withStatus(articleRev.getReviewStatus())
                                 .withInterest(articleRev.getInterest())
                                 .withOriginality(articleRev.getOriginality())
                                 .withSpecializationLevel(articleRev.getSpecializationLevel())

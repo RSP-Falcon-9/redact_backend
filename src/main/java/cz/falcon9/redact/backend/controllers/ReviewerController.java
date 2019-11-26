@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -36,6 +38,8 @@ import cz.falcon9.redact.backend.services.ReviewerService;
 @Secured("ROLE_REVIEWER")
 public class ReviewerController {
 
+    private final Logger log = LoggerFactory.getLogger(ReviewerController.class);
+    
     @Autowired
     ArticleService articleServ;
     
@@ -80,6 +84,7 @@ public class ReviewerController {
     }
     
     @GetMapping("/article/{id}/{version}")
+    @Transactional
     public BaseDto<GetReviewerArticleDetailResponse> handleGetReviewerArticleDetail(@PathVariable String id, @PathVariable Integer version) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = authentication.getName();
@@ -88,9 +93,9 @@ public class ReviewerController {
         if (articleVersion == null) {
             throw new ArgumentNotFoundException(String.format("Cannot find specified version %s for article %s!", version, id));
         }
-        
+
         Optional<ArticleReview> optionalReview = articleVersion.getReviews().stream().filter(rev ->
-        rev.getReviewer().getUserName().equals(currentUserName)).findFirst();
+            rev.getReviewer().getUserName().equals(currentUserName)).findFirst();
         if (!optionalReview.isPresent()) {
             throw new ArgumentNotFoundException(String.format("Cannot find review for version %s of article %s!", version, id));
         }
@@ -99,6 +104,7 @@ public class ReviewerController {
  
         return new BaseDto<GetReviewerArticleDetailResponse>(GetReviewerArticleDetailResponse.builder()
                 .withName(article.getName())
+                .withReviewId(review.getId())
                 .withReviewStatus(review.getReviewStatus())
                 .withInterest(review.getInterest())
                 .withOriginality(review.getOriginality())

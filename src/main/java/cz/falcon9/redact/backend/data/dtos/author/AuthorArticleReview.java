@@ -2,6 +2,8 @@ package cz.falcon9.redact.backend.data.dtos.author;
 
 import javax.annotation.Generated;
 
+import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
+
 public class AuthorArticleReview {
 
     /**
@@ -10,6 +12,7 @@ public class AuthorArticleReview {
     @Generated("SparkTools")
     public static final class Builder {
         private String id;
+        private ArticleReviewStatus status;
         private int interest;
         private int originality;
         private int specializationLevel;
@@ -52,26 +55,32 @@ public class AuthorArticleReview {
             this.specializationLevel = specializationLevel;
             return this;
         }
-    }
 
+        public Builder withStatus(ArticleReviewStatus status) {
+            this.status = status;
+            return this;
+        }
+    }
+    
     /**
      * Creates builder to build {@link AuthorArticleReview}.
-     * 
      * @return created builder
      */
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
-
+    
     private String id;
+
+    private ArticleReviewStatus status;
     
     private int interest;
-    
-    private int originality;
 
-    private int specializationLevel;
+    private int originality;
     
+    private int specializationLevel;
+
     private int languageLevel;
 
     private String comment;
@@ -79,6 +88,7 @@ public class AuthorArticleReview {
     @Generated("SparkTools")
     private AuthorArticleReview(Builder builder) {
         this.id = builder.id;
+        this.status = builder.status;
         this.interest = builder.interest;
         this.originality = builder.originality;
         this.specializationLevel = builder.specializationLevel;
@@ -108,6 +118,10 @@ public class AuthorArticleReview {
 
     public int getSpecializationLevel() {
         return specializationLevel;
+    }
+
+    public ArticleReviewStatus getStatus() {
+        return status;
     }
 
 }

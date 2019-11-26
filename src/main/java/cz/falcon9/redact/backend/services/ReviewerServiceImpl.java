@@ -48,7 +48,7 @@ public class ReviewerServiceImpl implements ReviewerService {
         }
         
         ArticleReview articleReview = optionalArticleReview.get();
-        if (articleReview.getReviewer().getUserName().equals(currentUserName)) {
+        if (!articleReview.getReviewer().getUserName().equals(currentUserName)) {
             throw new InvalidArgumentException("Review doesn't belong to the user!");
         }
         
@@ -64,6 +64,8 @@ public class ReviewerServiceImpl implements ReviewerService {
                 .withOriginality(form.getOriginality())
                 .withSpecializationLevel(form.getSpecializationLevel())
                 .withLanguageLevel(form.getLanguageLevel())
+                .withComment(form.getComment())
+                .withReviewer(articleReview.getReviewer())
                 .withReviewStatus(ArticleReviewStatus.REVIEWED)
                 .withReviewDate(new Date(Calendar.getInstance().getTime().getTime()))
                 .build());

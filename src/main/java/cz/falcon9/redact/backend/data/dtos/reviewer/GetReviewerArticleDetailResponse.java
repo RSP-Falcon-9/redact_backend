@@ -13,6 +13,7 @@ public class GetReviewerArticleDetailResponse {
     @Generated("SparkTools")
     public static final class Builder {
         private String name;
+        private String reviewId;
         private ArticleReviewStatus reviewStatus;
         private int interest;
         private int originality;
@@ -58,6 +59,11 @@ public class GetReviewerArticleDetailResponse {
             return this;
         }
 
+        public Builder withReviewId(String reviewId) {
+            this.reviewId = reviewId;
+            return this;
+        }
+
         public Builder withReviewStatus(ArticleReviewStatus reviewStatus) {
             this.reviewStatus = reviewStatus;
             return this;
@@ -68,7 +74,7 @@ public class GetReviewerArticleDetailResponse {
             return this;
         }
     }
-
+    
     /**
      * Creates builder to build {@link GetReviewerArticleDetailResponse}.
      * @return created builder
@@ -79,6 +85,8 @@ public class GetReviewerArticleDetailResponse {
     }
 
     private String name;
+
+    private String reviewId;
 
     private ArticleReviewStatus reviewStatus;
 
@@ -97,6 +105,7 @@ public class GetReviewerArticleDetailResponse {
     @Generated("SparkTools")
     private GetReviewerArticleDetailResponse(Builder builder) {
         this.name = builder.name;
+        this.reviewId = builder.reviewId;
         this.reviewStatus = builder.reviewStatus;
         this.interest = builder.interest;
         this.originality = builder.originality;
@@ -128,6 +137,10 @@ public class GetReviewerArticleDetailResponse {
 
     public Date getReviewDate() {
         return reviewDate;
+    }
+
+    public String getReviewId() {
+        return reviewId;
     }
 
     public ArticleReviewStatus getReviewStatus() {
