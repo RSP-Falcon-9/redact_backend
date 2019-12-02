@@ -261,6 +261,7 @@ public class ArticleServiceImpl implements ArticleService {
                     reviewerId, articleId, version));
         }
         
+        articleVersion.setStatus(ArticleStatus.REVIEW_PENDING);
         articleVersion.getReviews().add(ArticleReview.builder()
                 .withId(UUID.randomUUID().toString())
                 .withArticleId(articleId)
@@ -273,6 +274,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
     
     @Override
+    @Transactional
     public void setArticleStatus(String articleId, Integer version, ArticleStatus status) {
         Article article = getArticle(articleId);
         ArticleVersion articleVersion = article.getVersion(version);
