@@ -1,4 +1,22 @@
-INSERT IGNORE INTO `redact_user_roles` (`username`, `role`) VALUES
+CREATE TABLE `redact_users` (
+  `username` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `redact_users` (`username`, `password`) VALUES
+('admin', '$2a$10$QmC.Pzot8.WWGuYMHHAtVuS7is7EfIf6JCgLZ5UHvUrHpdKZHGLU6');
+
+CREATE TABLE `redact_user_roles` (
+  `username` VARCHAR(50) NOT NULL,
+  `role` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`username`, `role`),
+  CONSTRAINT `fk_username` FOREIGN KEY (`username`) REFERENCES `redact_users`(`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `redact_user_roles` (`username`, `role`) VALUES
+('admin', 'ROLE_ADMIN'),
+('admin', 'ROLE_USER'),
 ('admin', 'ROLE_AUTHOR'),
 ('admin', 'ROLE_REVIEWER'),
 ('admin', 'ROLE_EDITOR'),
@@ -34,6 +52,8 @@ CREATE TABLE `redact_article_review` (
   `language_level` TINYINT,
   `comment` TEXT,
   `review_date` DATE,
+  `appeal` TEXT,
+  `appeal_date` DATE,
   `visible_to_author` BOOLEAN NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `redact_users`(`username`)

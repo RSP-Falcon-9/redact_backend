@@ -2,6 +2,7 @@ package cz.falcon9.redact.backend.data.models.articles;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,7 +23,7 @@ import java.util.Collections;
 @Table(name = "redact_arcticle_version")
 @IdClass(ArticleVersionCompositeId.class)
 public class ArticleVersion {
-    
+
     @Id
     @Column(name = "article_id")
     private String articleId;
@@ -78,9 +79,24 @@ public class ArticleVersion {
     public List<ArticleReview> getReviews() {
         return reviews;
     }
+    
+    public ArticleReview getReviewWithReviewer(String reviewerId) {
+        Optional<ArticleReview> optionalArticleReview = reviews.stream().filter(review ->
+            review.getReviewer().getUserName().equals(reviewerId)).findAny();
+        
+        if (!optionalArticleReview.isPresent()) {
+            return null;
+        }
+        
+        return optionalArticleReview.get();
+    }
 
     public ArticleStatus getStatus() {
         return status;
+    }
+    
+    public void setStatus(ArticleStatus status) {
+        this.status = status;
     }
 
     public int getVersion() {

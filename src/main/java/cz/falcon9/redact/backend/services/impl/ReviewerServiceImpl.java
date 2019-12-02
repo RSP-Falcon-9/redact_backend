@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.services;
+package cz.falcon9.redact.backend.services.impl;
 
 import java.sql.Date;
 import java.util.Calendar;
@@ -19,6 +19,7 @@ import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.repositories.ArticleReviewRepository;
 import cz.falcon9.redact.backend.repositories.UserRepository;
+import cz.falcon9.redact.backend.services.ReviewerService;
 
 @Service
 public class ReviewerServiceImpl implements ReviewerService {

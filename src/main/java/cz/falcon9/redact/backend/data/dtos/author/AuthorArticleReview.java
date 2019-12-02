@@ -18,12 +18,18 @@ public class AuthorArticleReview {
         private int specializationLevel;
         private int languageLevel;
         private String comment;
+        private String appeal;
 
         private Builder() {
         }
 
         public AuthorArticleReview build() {
             return new AuthorArticleReview(this);
+        }
+
+        public Builder withAppeal(String appeal) {
+            this.appeal = appeal;
+            return this;
         }
 
         public Builder withComment(String comment) {
@@ -61,7 +67,7 @@ public class AuthorArticleReview {
             return this;
         }
     }
-    
+
     /**
      * Creates builder to build {@link AuthorArticleReview}.
      * @return created builder
@@ -78,12 +84,14 @@ public class AuthorArticleReview {
     private int interest;
 
     private int originality;
-    
-    private int specializationLevel;
 
+    private int specializationLevel;
+    
     private int languageLevel;
 
     private String comment;
+
+    private String appeal;
 
     @Generated("SparkTools")
     private AuthorArticleReview(Builder builder) {
@@ -94,6 +102,11 @@ public class AuthorArticleReview {
         this.specializationLevel = builder.specializationLevel;
         this.languageLevel = builder.languageLevel;
         this.comment = builder.comment;
+        this.appeal = builder.appeal;
+    }
+
+    public String getAppeal() {
+        return appeal;
     }
 
     public String getComment() {

@@ -111,6 +111,7 @@ public class ReviewerController {
                 .withSpecializationLevel(review.getSpecializationLevel())
                 .withLanguageLevel(review.getLanguageLevel())
                 .withReviewDate(review.getReviewDate())
+                .withComment(review.getComment())
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
     }

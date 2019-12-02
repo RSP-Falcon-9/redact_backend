@@ -16,7 +16,7 @@ import javax.annotation.Generated;
 @Entity
 @Table(name = "redact_article_review")
 public class ArticleReview {
-    
+
     /**
      * Builder to build {@link ArticleReview}.
      */
@@ -34,12 +34,24 @@ public class ArticleReview {
         private String comment;
         private Date reviewDate;
         private boolean visibleToAuthor;
+        private String appeal;
+        private Date appealDate;
 
         private Builder() {
         }
 
         public ArticleReview build() {
             return new ArticleReview(this);
+        }
+
+        public Builder withAppeal(String appeal) {
+            this.appeal = appeal;
+            return this;
+        }
+
+        public Builder withAppealDate(Date appealDate) {
+            this.appealDate = appealDate;
+            return this;
         }
 
         public Builder withArticleId(String articleId) {
@@ -111,7 +123,7 @@ public class ArticleReview {
     public static Builder builder() {
         return new Builder();
     }
-    
+
     @Id
     @Column()
     private String id;
@@ -149,6 +161,14 @@ public class ArticleReview {
 
     @Column(name = "visible_to_author")
     private boolean visibleToAuthor;
+
+    @Column
+    private String appeal;
+
+    @Column(name = "appeal_date")
+    private Date appealDate;
+
+    private ArticleReview() { }
     
     @Generated("SparkTools")
     private ArticleReview(Builder builder) {
@@ -164,9 +184,17 @@ public class ArticleReview {
         this.comment = builder.comment;
         this.reviewDate = builder.reviewDate;
         this.visibleToAuthor = builder.visibleToAuthor;
+        this.appeal = builder.appeal;
+        this.appealDate = builder.appealDate;
     }
     
-    private ArticleReview() { }
+    public String getAppeal() {
+        return appeal;
+    }
+
+    public Date getAppealDate() {
+        return appealDate;
+    }
     
     public String getArticleId() {
         return articleId;
@@ -187,7 +215,7 @@ public class ArticleReview {
     public int getLanguageLevel() {
         return languageLevel;
     }
-
+    
     public int getOriginality() {
         return originality;
     }
@@ -214,6 +242,22 @@ public class ArticleReview {
 
     public boolean isVisibleToAuthor() {
         return visibleToAuthor;
+    }
+
+    public void setAppeal(String appeal) {
+        this.appeal = appeal;
+    }
+    
+    public void setAppealDate(Date appealDate) {
+        this.appealDate = appealDate;
+    }
+
+    public void setReviewStatus(ArticleReviewStatus reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
+
+    public void setVisibleToAuthor(boolean visibleToAuthor) {
+        this.visibleToAuthor = visibleToAuthor;
     }
     
 }

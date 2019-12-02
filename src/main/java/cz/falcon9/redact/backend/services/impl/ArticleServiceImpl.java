@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.services;
+package cz.falcon9.redact.backend.services.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,19 +21,24 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
 import cz.falcon9.redact.backend.data.articles.ArticleStatus;
 import cz.falcon9.redact.backend.data.models.articles.Article;
+import cz.falcon9.redact.backend.data.models.articles.ArticleReview;
 import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
 import cz.falcon9.redact.backend.data.models.auth.User;
 import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
+import cz.falcon9.redact.backend.exceptions.ForbiddenException;
 //import cz.falcon9.redact.backend.exceptions.ForbiddenException;
 import cz.falcon9.redact.backend.exceptions.InternalException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.properties.RedactProperties;
 import cz.falcon9.redact.backend.repositories.ArticleRepository;
 import cz.falcon9.redact.backend.repositories.UserRepository;
+import cz.falcon9.redact.backend.services.ArticleService;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -193,10 +200,18 @@ public class ArticleServiceImpl implements ArticleService {
         }
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Set<String> roles = authentication.getAuthorities().stream()
+                .map(r -> r.getAuthority()).collect(Collectors.toSet());
         Article article = optionalArticle.get();
-        /*if (article.getUser().getUserName() != authentication.getName()) {
+        
+        if (roles.contains("ROLE_AUTHOR") && !article.getUser().getUserName().equals(authentication.getName())) {
             throw new ForbiddenException("You don't have access to this article!");
-        }*/
+        }
+        
+        if (roles.contains("ROLE_REVIEWER") &&
+                (article.getVersion(version).getReviewWithReviewer(authentication.getName()) == null)) {
+            throw new ForbiddenException("You don't have access to this article!");
+        }
         
         File articleFile = new File(redactProps.getArticlesDir().concat(File.separator)
                 .concat(articleId).concat("_").concat(version.toString()).concat(".pdf"));
@@ -210,6 +225,53 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public void updateArticle(Article article) {
         articleRepo.save(article);
+    }
+    
+    @Override
+    @Transactional
+    public void assignReviewerToArticle(String articleId, Integer version, String reviewerId) {
+        Article article = getArticle(articleId);
+        ArticleVersion articleVersion = article.getVersion(version);
+        
+        if (articleVersion == null) {
+            throw new ArgumentNotFoundException(String.format("Cannot find article version %s.", version));
+        }
+        
+        Optional<User> optionalReviewer = userRepo.findById(reviewerId);
+        if (!optionalReviewer.isPresent()) {
+            throw new ArgumentNotFoundException(String.format("Cannot find reviewer with id %s.", reviewerId));
+        }
+        
+        Optional<ArticleReview> optionalArticleReview = articleVersion.getReviews().stream().filter(articleRev ->
+            articleRev.getReviewer().getUserName().equals(reviewerId)).findFirst();
+        if (optionalArticleReview.isPresent()) {
+            throw new InvalidArgumentException(String.format("Reviewer %s was already assigned for this article %s and version %s.",
+                    reviewerId, articleId, version));
+        }
+        
+        articleVersion.getReviews().add(ArticleReview.builder()
+                .withId(UUID.randomUUID().toString())
+                .withArticleId(articleId)
+                .withVersion(version)
+                .withReviewStatus(ArticleReviewStatus.NEW)
+                .withReviewer(optionalReviewer.get())
+                .build());
+       
+        updateArticle(article);
+    }
+    
+    @Override
+    public void setArticleStatus(String articleId, Integer version, ArticleStatus status) {
+        Article article = getArticle(articleId);
+        ArticleVersion articleVersion = article.getVersion(version);
+        
+        if (articleVersion == null) {
+            throw new ArgumentNotFoundException(String.format("Cannot find article version %s.", version));
+        }
+        
+        articleVersion.setStatus(status);
+        
+        updateArticle(article);
     }
     
 }

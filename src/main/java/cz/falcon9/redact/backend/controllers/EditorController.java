@@ -2,6 +2,8 @@ package cz.falcon9.redact.backend.controllers;
 
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.falcon9.redact.backend.data.articles.ArticleStatus;
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleVersion;
+import cz.falcon9.redact.backend.data.dtos.editor.DenyArticleRequest;
 import cz.falcon9.redact.backend.data.dtos.editor.EditorArticle;
 import cz.falcon9.redact.backend.data.dtos.editor.GetEditorArticlesResponse;
 import cz.falcon9.redact.backend.data.dtos.editor.GetReviewersResponse;
@@ -28,17 +32,18 @@ import cz.falcon9.redact.backend.services.EditorService;
 public class EditorController {
 
     @Autowired
-    ArticleService articleService;
+    ArticleService articleServ;
     
     @Autowired
     EditorService editorServ;
+    
     
     @GetMapping("/articles")
     @Transactional
     public BaseDto<GetEditorArticlesResponse> handleGetEditorArticles() {
         return new BaseDto<GetEditorArticlesResponse>(
                 GetEditorArticlesResponse.builder()
-                        .withArticles(articleService.getAllArticles().stream()
+                        .withArticles(articleServ.getAllArticles().stream()
                                 .map(article -> EditorArticle.builder()
                                         .withId(article.getId())
                                         .withName(article.getName())
@@ -57,13 +62,6 @@ public class EditorController {
                 "Successfully got all articles.");
     }
     
-    /*@PostMapping("/deny/{articleId}/{version}")
-    public BaseDto<Void> handleDenyArticle(@PathVariable String articleId, @PathVariable Integer version, @RequestParam("reason") String reason) {
-        
-        
-        return new BaseDto<Void>(String.format("Successfully denied article %s and version %s with reason %s.", articleId, version, reason));
-    }*/
-    
     @GetMapping("/reviewers")
     public BaseDto<GetReviewersResponse> handleGetReviewersResponse() {
         return new BaseDto<GetReviewersResponse>(GetReviewersResponse.builder()
@@ -77,17 +75,25 @@ public class EditorController {
     @PostMapping("/review/{articleId}/{version}")
     public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version,
             @RequestBody SetReviewerToArticleRequest request) {
-        editorServ.assignReviewerToArticle(articleId, version, request.getReviewerId());
+        articleServ.assignReviewerToArticle(articleId, version, request.getReviewerId());
         
         return new BaseDto<Void>(String.format("Successfully set reviewer %s to article %s and version %s.", 
                 request.getReviewerId(), articleId, version));
     }
     
-    /*@PostMapping("/accept/{articleId}/{version}")
-    public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version) {
+    @PostMapping("/deny/{articleId}/{version}")
+    public BaseDto<Void> handleDenyArticle(@PathVariable String articleId, @PathVariable Integer version) {
+        articleServ.setArticleStatus(articleId, version, ArticleStatus.DENIED);
         
+        return new BaseDto<Void>(String.format("Successfully denied article %s and version %s.",
+                articleId, version));
+    }
+    
+    @PostMapping("/accept/{articleId}/{version}")
+    public BaseDto<Void> handleSetReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version) {
+        articleServ.setArticleStatus(articleId, version, ArticleStatus.ACCEPTED);
         
         return new BaseDto<Void>(String.format("Successfully accepted article %s and version %s.", articleId, version));
-    }*/
+    }
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.multipart.MultipartFile;
 
+import cz.falcon9.redact.backend.data.articles.ArticleStatus;
 import cz.falcon9.redact.backend.data.models.articles.Article;
 
 public interface ArticleService {
@@ -15,9 +16,10 @@ public interface ArticleService {
     List<Article> getAllArticlesForReviewer(String reviewerId);
     Article insertNewArticle(String name, MultipartFile file);
     Article insertNewArticleVersion(String id, MultipartFile file);
-    //Article insertNewArticleVersion();
     Article getArticle(String articleId);
     FileSystemResource getArticleFile(String articleId, Integer version);
     void updateArticle(Article article);
+    void assignReviewerToArticle(String articleId, Integer version, String reviewerId);
+    void setArticleStatus(String articleId, Integer version, ArticleStatus status);
     
 }

@@ -1,6 +1,10 @@
 package cz.falcon9.redact.backend.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -10,22 +14,27 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
+import cz.falcon9.redact.backend.data.dtos.author.AuthorAppealRequest;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticle;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleReview;
 import cz.falcon9.redact.backend.data.dtos.author.AuthorArticleVersion;
 import cz.falcon9.redact.backend.data.dtos.author.GetAuthorArticleDetail;
 import cz.falcon9.redact.backend.data.dtos.author.GetAuthorArticlesResponse;
 import cz.falcon9.redact.backend.data.models.articles.Article;
+import cz.falcon9.redact.backend.data.models.articles.ArticleReview;
 import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
 import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
 import cz.falcon9.redact.backend.services.ArticleService;
+import cz.falcon9.redact.backend.services.ReviewService;
 
 @RestController
 @RequestMapping("/author")
@@ -34,6 +43,9 @@ public class AuthorController {
 
     @Autowired
     ArticleService articleService;
+    
+    @Autowired
+    ReviewService reviewServ;
     
     @GetMapping("/articles")
     @Transactional
@@ -121,21 +133,34 @@ public class AuthorController {
             throw new ArgumentNotFoundException(String.format("Cannot find specified version %s for article %s!", version, id));
         }
         
+        List<AuthorArticleReview> authorReviews = new ArrayList<>();
+        for (ArticleReview review : articleVersion.getReviews()) {
+            if (!review.isVisibleToAuthor() &&
+                    review.getReviewStatus() == ArticleReviewStatus.NEW) continue;
+            
+            authorReviews.add(AuthorArticleReview.builder()
+                    .withId(review.getId())
+                    .withStatus(review.getReviewStatus())
+                    .withInterest(review.getInterest())
+                    .withOriginality(review.getOriginality())
+                    .withSpecializationLevel(review.getSpecializationLevel())
+                    .withLanguageLevel(review.getLanguageLevel())
+                    .withComment(review.getComment())
+                    .build());
+        }
+        
         return new BaseDto<GetAuthorArticleDetail>(GetAuthorArticleDetail.builder()
                 .withName(article.getName())
-                .withReviews(articleVersion.getReviews().stream()
-                        .map(articleRev -> AuthorArticleReview.builder()
-                                .withId(articleRev.getId())
-                                .withStatus(articleRev.getReviewStatus())
-                                .withInterest(articleRev.getInterest())
-                                .withOriginality(articleRev.getOriginality())
-                                .withSpecializationLevel(articleRev.getSpecializationLevel())
-                                .withLanguageLevel(articleRev.getLanguageLevel())
-                                .withComment(articleRev.getComment())
-                                .build())
-                        .collect(Collectors.toList()))
+                .withReviews(authorReviews)
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
+    }
+    
+    @PostMapping("/appeal/{reviewId}")
+    public BaseDto<Void> handleAppealReview(@PathVariable String reviewId, @Valid @RequestBody AuthorAppealRequest request) {
+        reviewServ.appealReview(reviewId, request.getAppeal());
+        
+        return new BaseDto<Void>(String.format("Successfully appealed review with id %s", reviewId));
     }
     
 }
