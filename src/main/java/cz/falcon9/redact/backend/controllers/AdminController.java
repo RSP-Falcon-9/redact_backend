@@ -6,9 +6,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,9 +20,8 @@ import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.admin.GetUsersResponse;
 import cz.falcon9.redact.backend.data.dtos.admin.UserCreationRequest;
 import cz.falcon9.redact.backend.data.dtos.admin.UserDetail;
-import cz.falcon9.redact.backend.data.models.User;
-import cz.falcon9.redact.backend.data.models.UserRole;
-import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
+import cz.falcon9.redact.backend.data.models.auth.User;
+import cz.falcon9.redact.backend.data.models.auth.UserRole;
 import cz.falcon9.redact.backend.services.AdminService;
 
 @RestController
@@ -63,22 +59,6 @@ public class AdminController {
     
     @PostMapping("/user/{userName}")
     public BaseDto<Void> handleCreateUser(@PathVariable String userName, @RequestBody @Valid UserCreationRequest request) {
-        // prevent admin overwrite
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUserName = authentication.getName();
-            
-            if (currentUserName == userName) {
-                throw new InvalidArgumentException("Admin cannot overwrite himself!");
-            }
-        }
-        
-        // prevent admin overwrite
-        if (userName == "admin") {
-            throw new InvalidArgumentException("Admin account cannot be overwrited!");
-        }
-        
         adminService.insertUser(User.builder()
                 .withUserName(userName)
                 .withPassword(passwordEncoder.encode(request.getPassword()))
@@ -95,22 +75,6 @@ public class AdminController {
 
     @DeleteMapping("/user/{userName}")
     public BaseDto<Void> handleDeleteUser(@PathVariable String userName) {
-    	// prevent self deletion
-    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    	
-    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
-    	    String currentUserName = authentication.getName();
-    	    
-    	    if (currentUserName == userName) {
-    	    	throw new InvalidArgumentException("Admin cannot delete himself!");
-    	    }
-    	}
-    	
-    	// prevent admin deletion
-    	if (userName == "admin") {
-    	    throw new InvalidArgumentException("Admin account cannot be deleted!");
-    	}
-    	
     	adminService.deleteUser(userName);
     	
     	return new BaseDto<Void>(String.format("Successfully deleted user %s.", userName));
