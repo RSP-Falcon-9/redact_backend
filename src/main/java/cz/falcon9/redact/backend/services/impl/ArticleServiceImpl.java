@@ -147,12 +147,18 @@ public class ArticleServiceImpl implements ArticleService {
         
         Article article = optionalArticle.get();
         ArticleVersion articleVersion = article.getLatestVersion();
-        String fileName = id.concat("_").concat(String.valueOf(articleVersion.getVersion() + 1)).concat(".pdf");
+        if (articleVersion.getStatus() != ArticleStatus.DENIED) {
+            throw new InvalidArgumentException(String.format("Cannot upload new version until article %s version %s is denied!",
+                    id, articleVersion.getVersion()));
+        }
+        
+        Integer nextVersion = articleVersion.getVersion() + 1;
+        String fileName = id.concat("_").concat(String.valueOf(nextVersion)).concat(".pdf");
         
         article.getVersions().add(ArticleVersion.builder()
                 .withArticleId(id)
                 .withFileName(fileName)
-                .withVersion(0)
+                .withVersion(nextVersion)
                 .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
                 .withStatus(ArticleStatus.NEW)
                 .build());
