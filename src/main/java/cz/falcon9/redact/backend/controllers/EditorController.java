@@ -95,6 +95,7 @@ public class EditorController {
         }
         
         return new BaseDto<GetEditorArticleDetail>(GetEditorArticleDetail.builder()
+                .withName(article.getName())
                 .withReviews(editorReviews)
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));

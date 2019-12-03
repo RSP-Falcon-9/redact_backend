@@ -11,6 +11,7 @@ public class GetEditorArticleDetail {
      */
     @Generated("SparkTools")
     public static final class Builder {
+        private String name;
         private List<EditorArticleReview> reviews = Collections.emptyList();
 
         private Builder() {
@@ -20,12 +21,17 @@ public class GetEditorArticleDetail {
             return new GetEditorArticleDetail(this);
         }
 
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
         public Builder withReviews(List<EditorArticleReview> reviews) {
             this.reviews = reviews;
             return this;
         }
     }
-
+    
     /**
      * Creates builder to build {@link GetEditorArticleDetail}.
      * @return created builder
@@ -35,11 +41,18 @@ public class GetEditorArticleDetail {
         return new Builder();
     }
 
+    private String name;
+
     private List<EditorArticleReview> reviews;
 
     @Generated("SparkTools")
     private GetEditorArticleDetail(Builder builder) {
+        this.name = builder.name;
         this.reviews = builder.reviews;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<EditorArticleReview> getReviews() {

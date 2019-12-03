@@ -14,19 +14,31 @@ public class GetReviewerArticleDetailResponse {
     public static final class Builder {
         private String name;
         private String reviewId;
+        private Date reviewDate;
         private ArticleReviewStatus reviewStatus;
         private int interest;
         private int originality;
         private int specializationLevel;
         private int languageLevel;
         private String comment;
-        private Date reviewDate;
+        private String appeal;
+        private Date appealDate;
 
         private Builder() {
         }
 
         public GetReviewerArticleDetailResponse build() {
             return new GetReviewerArticleDetailResponse(this);
+        }
+
+        public Builder withAppeal(String appeal) {
+            this.appeal = appeal;
+            return this;
+        }
+
+        public Builder withAppealDate(Date appealDate) {
+            this.appealDate = appealDate;
+            return this;
         }
 
         public Builder withComment(String comment) {
@@ -74,7 +86,7 @@ public class GetReviewerArticleDetailResponse {
             return this;
         }
     }
-    
+
     /**
      * Creates builder to build {@link GetReviewerArticleDetailResponse}.
      * @return created builder
@@ -83,10 +95,12 @@ public class GetReviewerArticleDetailResponse {
     public static Builder builder() {
         return new Builder();
     }
-
+    
     private String name;
 
     private String reviewId;
+
+    private Date reviewDate;
 
     private ArticleReviewStatus reviewStatus;
 
@@ -97,22 +111,34 @@ public class GetReviewerArticleDetailResponse {
     private int specializationLevel;
 
     private int languageLevel;
-
+    
     private String comment;
 
-    private Date reviewDate;
+    private String appeal;
     
+    private Date appealDate;
+
     @Generated("SparkTools")
     private GetReviewerArticleDetailResponse(Builder builder) {
         this.name = builder.name;
         this.reviewId = builder.reviewId;
+        this.reviewDate = builder.reviewDate;
         this.reviewStatus = builder.reviewStatus;
         this.interest = builder.interest;
         this.originality = builder.originality;
         this.specializationLevel = builder.specializationLevel;
         this.languageLevel = builder.languageLevel;
         this.comment = builder.comment;
-        this.reviewDate = builder.reviewDate;
+        this.appeal = builder.appeal;
+        this.appealDate = builder.appealDate;
+    }
+
+    public String getAppeal() {
+        return appeal;
+    }
+
+    public Date getAppealDate() {
+        return appealDate;
     }
 
     public String getComment() {
