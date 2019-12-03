@@ -1,19 +1,21 @@
-package cz.falcon9.redact.backend.data.dtos.author;
+package cz.falcon9.redact.backend.data.dtos.editor;
+
+import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
 
 import java.sql.Date;
 
 import javax.annotation.Generated;
 
-import cz.falcon9.redact.backend.data.articles.ArticleReviewStatus;
-
-public class AuthorArticleReview {
-
+public class EditorArticleReview {
+    
     /**
-     * Builder to build {@link AuthorArticleReview}.
+     * Builder to build {@link EditorArticleReview}.
      */
     @Generated("SparkTools")
     public static final class Builder {
         private String id;
+        private Reviewer reviewer;
+        private Date reviewDate;
         private ArticleReviewStatus status;
         private int interest;
         private int originality;
@@ -26,8 +28,8 @@ public class AuthorArticleReview {
         private Builder() {
         }
 
-        public AuthorArticleReview build() {
-            return new AuthorArticleReview(this);
+        public EditorArticleReview build() {
+            return new EditorArticleReview(this);
         }
 
         public Builder withAppeal(String appeal) {
@@ -65,6 +67,16 @@ public class AuthorArticleReview {
             return this;
         }
 
+        public Builder withReviewDate(Date reviewDate) {
+            this.reviewDate = reviewDate;
+            return this;
+        }
+
+        public Builder withReviewer(Reviewer reviewer) {
+            this.reviewer = reviewer;
+            return this;
+        }
+
         public Builder withSpecializationLevel(int specializationLevel) {
             this.specializationLevel = specializationLevel;
             return this;
@@ -77,35 +89,41 @@ public class AuthorArticleReview {
     }
 
     /**
-     * Creates builder to build {@link AuthorArticleReview}.
+     * Creates builder to build {@link EditorArticleReview}.
      * @return created builder
      */
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
-    
+
     private String id;
+
+    private Reviewer reviewer;
+    
+    private Date reviewDate;
 
     private ArticleReviewStatus status;
 
     private int interest;
-    
+
     private int originality;
 
     private int specializationLevel;
 
     private int languageLevel;
-    
+
     private String comment;
-
+    
     private String appeal;
-
+    
     private Date appealDate;
 
     @Generated("SparkTools")
-    private AuthorArticleReview(Builder builder) {
+    private EditorArticleReview(Builder builder) {
         this.id = builder.id;
+        this.reviewer = builder.reviewer;
+        this.reviewDate = builder.reviewDate;
         this.status = builder.status;
         this.interest = builder.interest;
         this.originality = builder.originality;
@@ -127,7 +145,7 @@ public class AuthorArticleReview {
     public String getComment() {
         return comment;
     }
-
+    
     public String getId() {
         return id;
     }
@@ -144,6 +162,14 @@ public class AuthorArticleReview {
         return originality;
     }
 
+    public Date getReviewDate() {
+        return reviewDate;
+    }
+
+    public Reviewer getReviewer() {
+        return reviewer;
+    }
+
     public int getSpecializationLevel() {
         return specializationLevel;
     }
@@ -151,5 +177,5 @@ public class AuthorArticleReview {
     public ArticleReviewStatus getStatus() {
         return status;
     }
-
+    
 }
