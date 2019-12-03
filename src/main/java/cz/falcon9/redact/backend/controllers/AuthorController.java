@@ -135,7 +135,7 @@ public class AuthorController {
         
         List<AuthorArticleReview> authorReviews = new ArrayList<>();
         for (ArticleReview review : articleVersion.getReviews()) {
-            if (!review.isVisibleToAuthor() &&
+            if (!review.isVisibleToAuthor() ||
                     review.getReviewStatus() == ArticleReviewStatus.NEW) continue;
             
             authorReviews.add(AuthorArticleReview.builder()
@@ -146,6 +146,8 @@ public class AuthorController {
                     .withSpecializationLevel(review.getSpecializationLevel())
                     .withLanguageLevel(review.getLanguageLevel())
                     .withComment(review.getComment())
+                    .withAppeal(review.getAppeal())
+                    .withAppealDate(review.getAppealDate())
                     .build());
         }
         

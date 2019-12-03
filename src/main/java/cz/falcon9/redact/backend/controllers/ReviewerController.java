@@ -62,7 +62,7 @@ public class ReviewerController {
                     rev.getReviewer().getUserName().equals(currentUserName)).findFirst();
                 if (optionalReview.isPresent()) {
                     ArticleReview review = optionalReview.get();
-
+                    
                     reviewerArticles.add(ReviewerArticle.builder()
                             .withId(article.getId())
                             .withName(article.getName())
@@ -79,7 +79,7 @@ public class ReviewerController {
                 GetReviewerArticlesResponse.builder()
                         .withArticles(reviewerArticles)
                         .build(),
-                String.format("Successfully got articles authored by %s.", currentUserName));
+                String.format("Successfully got article reviews for %s.", currentUserName));
        
     }
     
@@ -112,6 +112,8 @@ public class ReviewerController {
                 .withLanguageLevel(review.getLanguageLevel())
                 .withReviewDate(review.getReviewDate())
                 .withComment(review.getComment())
+                .withAppeal(review.getAppeal())
+                .withAppealDate(review.getAppealDate())
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
     }
