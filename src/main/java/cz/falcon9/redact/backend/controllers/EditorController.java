@@ -91,6 +91,7 @@ public class EditorController {
                     .withComment(review.getComment())
                     .withAppeal(review.getAppeal())
                     .withAppealDate(review.getAppealDate())
+                    .withVisibleToAuthor(review.isVisibleToAuthor())
                     .build());
         }
         
@@ -146,7 +147,7 @@ public class EditorController {
     public BaseDto<Void> handleSwitchReviewVisibility(@PathVariable String reviewId, @RequestParam @NotNull boolean visibility) {
         reviewServ.switchAuthorReviewVisibility(reviewId, visibility);
         
-        return new BaseDto<Void>("Successfully get all reviewers.");
+        return new BaseDto<Void>(String.format("Successfully switched review visibility for review %s to %s.", reviewId, visibility));
     }
 
 }

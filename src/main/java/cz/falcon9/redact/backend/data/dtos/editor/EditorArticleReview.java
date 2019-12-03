@@ -24,6 +24,7 @@ public class EditorArticleReview {
         private String comment;
         private String appeal;
         private Date appealDate;
+        private boolean visibleToAuthor;
 
         private Builder() {
         }
@@ -86,6 +87,11 @@ public class EditorArticleReview {
             this.status = status;
             return this;
         }
+
+        public Builder withVisibleToAuthor(boolean visibleToAuthor) {
+            this.visibleToAuthor = visibleToAuthor;
+            return this;
+        }
     }
 
     /**
@@ -96,11 +102,11 @@ public class EditorArticleReview {
     public static Builder builder() {
         return new Builder();
     }
-
+    
     private String id;
 
     private Reviewer reviewer;
-    
+
     private Date reviewDate;
 
     private ArticleReviewStatus status;
@@ -110,14 +116,16 @@ public class EditorArticleReview {
     private int originality;
 
     private int specializationLevel;
-
+    
     private int languageLevel;
-
+    
     private String comment;
     
     private String appeal;
-    
+
     private Date appealDate;
+
+    private boolean visibleToAuthor;
 
     @Generated("SparkTools")
     private EditorArticleReview(Builder builder) {
@@ -132,12 +140,13 @@ public class EditorArticleReview {
         this.comment = builder.comment;
         this.appeal = builder.appeal;
         this.appealDate = builder.appealDate;
+        this.visibleToAuthor = builder.visibleToAuthor;
     }
 
     public String getAppeal() {
         return appeal;
     }
-
+    
     public Date getAppealDate() {
         return appealDate;
     }
@@ -145,7 +154,7 @@ public class EditorArticleReview {
     public String getComment() {
         return comment;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -176,6 +185,10 @@ public class EditorArticleReview {
 
     public ArticleReviewStatus getStatus() {
         return status;
+    }
+
+    public boolean isVisibleToAuthor() {
+        return visibleToAuthor;
     }
     
 }
