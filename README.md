@@ -1,4 +1,4 @@
-# redact_backend
+# redact_backend [![Build Status](https://travis-ci.com/RSP-Falcon-9/redact_backend.svg?branch=master)](https://travis-ci.com/RSP-Falcon-9/redact_backend)
 Backend pro systém Redact.
 
 ## Jak buildovat?
