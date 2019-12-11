@@ -9,8 +9,13 @@ plugins {
 group = 'cz.falcon9.redact'
 version = '1.1.0-SNAPSHOT'
 sourceCompatibility = '1.8'
+description = 'System for managing the workflow of Logos Polytechnikos. Built for school course "RSP"'
 
 def documentationFilesPath = "$buildDir/libs/docs";
+
+bootJar {
+   archiveFileName = 'redact.jar'
+}
 
 repositories {
     mavenCentral()
