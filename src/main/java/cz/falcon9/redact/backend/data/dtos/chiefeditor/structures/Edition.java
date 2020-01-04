@@ -3,14 +3,14 @@ package cz.falcon9.redact.backend.data.dtos.chiefeditor.structures;
 import java.time.ZonedDateTime;
 import javax.annotation.Generated;
 
-public class ChiefEditorEdition {
+public class Edition {
     
     /**
-     * Builder to build {@link ChiefEditorEdition}.
+     * Builder to build {@link Edition}.
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private Integer number;
+        private Integer id;
         private String description;
         private ZonedDateTime deadline;
         private boolean archived;
@@ -18,8 +18,8 @@ public class ChiefEditorEdition {
         private Builder() {
         }
 
-        public ChiefEditorEdition build() {
-            return new ChiefEditorEdition(this);
+        public Edition build() {
+            return new Edition(this);
         }
 
         public Builder withArchived(boolean archived) {
@@ -37,14 +37,14 @@ public class ChiefEditorEdition {
             return this;
         }
 
-        public Builder withNumber(Integer number) {
-            this.number = number;
+        public Builder withId(Integer id) {
+            this.id = id;
             return this;
         }
     }
     
     /**
-     * Creates builder to build {@link ChiefEditorEdition}.
+     * Creates builder to build {@link Edition}.
      * @return created builder
      */
     @Generated("SparkTools")
@@ -52,14 +52,14 @@ public class ChiefEditorEdition {
         return new Builder();
     }
     
-    private Integer number;
+    private Integer id;
     private String description;
     private ZonedDateTime deadline;
     private boolean archived;
     
     @Generated("SparkTools")
-    private ChiefEditorEdition(Builder builder) {
-        this.number = builder.number;
+    private Edition(Builder builder) {
+        this.id = builder.id;
         this.description = builder.description;
         this.deadline = builder.deadline;
         this.archived = builder.archived;
@@ -73,8 +73,8 @@ public class ChiefEditorEdition {
         return description;
     }
     
-    public Integer getNumber() {
-        return number;
+    public Integer getId() {
+        return id;
     }
     
     public boolean isArchived() {

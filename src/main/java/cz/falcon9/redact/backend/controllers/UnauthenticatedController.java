@@ -11,25 +11,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
+import cz.falcon9.redact.backend.data.dtos.unauthenticated.GetArchivesResponse;
 import cz.falcon9.redact.backend.services.EditionService;
 
 @RestController
-@RequestMapping("/unauthorized")
-public class UnauthorizedController {
+@RequestMapping("/unauthenticated")
+public class UnauthenticatedController {
 
     @Autowired
     private EditionService editionServ;
     
-    @GetMapping(value = "/archives")
-    public BaseDto<List<String>> handleGetArchives() {
-        return new BaseDto<List<String>>(
-                editionServ.getArchivedEditions().stream()
+    @GetMapping("/archives")
+    public BaseDto<GetArchivesResponse> handleGetArchives() {
+        List<String> archives = editionServ.getArchivedEditions().stream()
                 .map(archivedEdition -> archivedEdition.getId().toString())
-                .collect(Collectors.toList()),
+                .collect(Collectors.toList());
+        
+        return new BaseDto<GetArchivesResponse>(
+                GetArchivesResponse.builder()
+                .withArchives(archives)
+                .build(),
                 "Successfully got list of archives.");
     }
     
-    @GetMapping(value = "/archive/{editionNumber}")
+    @GetMapping("/archive/{editionNumber}")
     public FileSystemResource handleGetArchiveFile(@PathVariable Integer editionNumber) {
         return editionServ.getArchiveFile(editionNumber);
     }

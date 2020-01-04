@@ -1,10 +1,14 @@
 package cz.falcon9.redact.backend.controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,13 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
 import cz.falcon9.redact.backend.data.dtos.chiefeditor.CreateEditionRequest;
-import cz.falcon9.redact.backend.data.dtos.chiefeditor.structures.ChiefEditorEdition;
+import cz.falcon9.redact.backend.data.dtos.chiefeditor.CreateEditionResponse;
+import cz.falcon9.redact.backend.data.dtos.chiefeditor.GetEditionsResponse;
+import cz.falcon9.redact.backend.data.dtos.chiefeditor.structures.Edition;
 import cz.falcon9.redact.backend.data.models.editions.EditionEntity;
 import cz.falcon9.redact.backend.services.ArticleService;
 import cz.falcon9.redact.backend.services.EditionService;
 
 @RestController
-@RequestMapping("/chief_editor")
+@RequestMapping("/chief-editor")
 @Secured("ROLE_CHIEF_EDITOR")
 public class ChiefEditorController {
 
@@ -44,16 +50,37 @@ public class ChiefEditorController {
         return new BaseDto<Void>(String.format("Article %s deleted successfully!", articleId));
     }
     
-    @PostMapping("/edition")
-    public BaseDto<ChiefEditorEdition> createEdition(@RequestBody @Valid CreateEditionRequest request) {
-        EditionEntity edition = editionServ.createNew(request.getDescription(), request.getDeadline());
+    @GetMapping("/editions")
+    public BaseDto<GetEditionsResponse> handleGetEditions() {
+        List<Edition> editions = editionServ.getEditions().stream()
+                .map(editionEntity ->Edition.builder()
+                        .withId(editionEntity.getId())
+                        .withDescription(editionEntity.getDescription())
+                        .withDeadline(editionEntity.getDeadline())
+                        .withArchived(editionEntity.isArchived())
+                        .build())
+                .collect(Collectors.toList());
         
-        return new BaseDto<ChiefEditorEdition>(
-                ChiefEditorEdition.builder()
-                .withNumber(edition.getId())
-                .withDescription(edition.getDescription())
-                .withDeadline(edition.getDeadline())
-                .withArchived(edition.isArchived())
+        return new BaseDto<GetEditionsResponse>(
+                GetEditionsResponse.builder()
+                .withEditions(editions)
+                .build(),
+                "Successfully got editions!");
+    }
+    
+    @PostMapping("/edition")
+    public BaseDto<CreateEditionResponse> createEdition(@RequestBody @Valid CreateEditionRequest request) {
+        EditionEntity editionEntity = editionServ.createNew(request.getDescription(), request.getDeadline());
+        Edition edition = Edition.builder()
+                .withId(editionEntity.getId())
+                .withDescription(editionEntity.getDescription())
+                .withDeadline(editionEntity.getDeadline())
+                .withArchived(editionEntity.isArchived())
+                .build();
+        
+        return new BaseDto<CreateEditionResponse>(
+                CreateEditionResponse.builder()
+                .withEdition(edition)
                 .build(),
                 String.format("Edition %s was successfully created!", edition.getId()));
     }
@@ -65,7 +92,7 @@ public class ChiefEditorController {
         return new BaseDto<Void>(String.format("Edition %s was successfully deleted!", editionNumber));
     }
     
-    @DeleteMapping("/edition/archive/{editionNumber}")
+    @GetMapping("/edition/archive/{editionNumber}")
     public BaseDto<Void> archiveEdition(@PathVariable Integer editionNumber) {
         editionServ.archive(editionNumber);
         

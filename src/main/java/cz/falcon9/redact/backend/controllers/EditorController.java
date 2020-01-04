@@ -149,5 +149,13 @@ public class EditorController {
         
         return new BaseDto<Void>(String.format("Successfully switched review visibility for review %s to %s.", reviewId, visibility));
     }
+    
+    @GetMapping("/set-article-edition/{articleId}")
+    public BaseDto<Void> handleSetArticleEdition(@PathVariable String articleId,
+            @RequestParam @NotNull Integer editionNumber) {
+        articleServ.setArticleEdition(articleId, editionNumber);
+        
+        return new BaseDto<Void>(String.format("Successfully set article %s edition to %s.", articleId, editionNumber));
+    }
 
 }

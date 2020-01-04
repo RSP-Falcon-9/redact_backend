@@ -17,7 +17,7 @@ import cz.falcon9.redact.backend.services.ArticleService;
 public class ArticleController {
     
     @Autowired
-    ArticleService articleService;
+    private ArticleService articleService;
     
     @GetMapping(value = "/{id}/{version}/file", produces = MediaType.APPLICATION_PDF_VALUE )
     public FileSystemResource handleGetArticleFile(@PathVariable String id, @PathVariable Integer version) {
