@@ -125,7 +125,6 @@ public class ArticleReview {
     }
 
     @Id
-    @Column()
     private String id;
 
     @Column(name = "article_id")

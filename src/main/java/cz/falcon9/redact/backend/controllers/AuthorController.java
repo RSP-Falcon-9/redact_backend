@@ -42,10 +42,10 @@ import cz.falcon9.redact.backend.services.ReviewService;
 public class AuthorController {
 
     @Autowired
-    ArticleService articleService;
+    private ArticleService articleService;
     
     @Autowired
-    ReviewService reviewServ;
+    private ReviewService reviewServ;
     
     @GetMapping("/articles")
     @Transactional
@@ -74,14 +74,16 @@ public class AuthorController {
     }
     
     @PostMapping("/article")
-    public BaseDto<AuthorArticle> handleCreateArticle(@RequestParam(value = "name") String name,
+    public BaseDto<AuthorArticle> handleCreateArticle(
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "editionNumber") Integer editionNumber,
             @RequestParam(value = "file") MultipartFile file) {
         String[] fileNameParts = file.getOriginalFilename().split("\\.");
         if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
             throw new InvalidArgumentException("Only .pdf files are supported!");
         }
         
-        Article article = articleService.insertNewArticle(name, file);
+        Article article = articleService.insertNewArticle(name, editionNumber, file);
 
         return new BaseDto<AuthorArticle>(AuthorArticle.builder()
                 .withId(article.getId())

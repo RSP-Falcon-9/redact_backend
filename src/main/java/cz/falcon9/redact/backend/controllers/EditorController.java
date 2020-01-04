@@ -41,13 +41,13 @@ import cz.falcon9.redact.backend.services.ReviewService;
 public class EditorController {
 
     @Autowired
-    ArticleService articleServ;
+    private ArticleService articleServ;
     
     @Autowired
-    EditorService editorServ;
+    private EditorService editorServ;
     
     @Autowired
-    ReviewService reviewServ;
+    private ReviewService reviewServ;
     
     @PostMapping("/reviewer/assign/{articleId}/{version}")
     public BaseDto<Void> handleAssignReviewerToArticle(@PathVariable String articleId, @PathVariable Integer version,
@@ -66,13 +66,13 @@ public class EditorController {
                 articleId, version));
     }
     
-    @GetMapping("/article/{id}/{version}")
+    @GetMapping("/article/{articleId}/{version}")
     @Transactional
-    public BaseDto<GetEditorArticleDetail> handleGetArticleDetail(@PathVariable String id, @PathVariable Integer version) {
-        Article article = articleServ.getArticle(id);
+    public BaseDto<GetEditorArticleDetail> handleGetArticleDetail(@PathVariable String articleId, @PathVariable Integer version) {
+        Article article = articleServ.getArticle(articleId);
         ArticleVersion articleVersion = article.getVersion(version);
         if (articleVersion == null) {
-            throw new ArgumentNotFoundException(String.format("Cannot find specified version %s for article %s!", version, id));
+            throw new ArgumentNotFoundException(String.format("Cannot find specified version %s for article %s!", version, articleId));
         }
         
         List<EditorArticleReview> editorReviews = new ArrayList<>();
@@ -99,7 +99,7 @@ public class EditorController {
                 .withName(article.getName())
                 .withReviews(editorReviews)
                 .build(),
-                String.format("Successfully got article with id %s and version %s.", id, version));
+                String.format("Successfully got article with id %s and version %s.", articleId, version));
     }
     
     @GetMapping("/articles")

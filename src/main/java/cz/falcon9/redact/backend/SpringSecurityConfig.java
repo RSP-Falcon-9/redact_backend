@@ -21,7 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import cz.falcon9.redact.backend.auth.JwtAuthenticationFilter;
 import cz.falcon9.redact.backend.auth.JwtAuthorizationFilter;
-import cz.falcon9.redact.backend.properties.RedactProperties;
+import cz.falcon9.redact.backend.config.RedactConfig;
 
 @Configuration
 @EnableGlobalMethodSecurity(
@@ -34,7 +34,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     DataSource dataSource;   
 
     @Autowired
-    RedactProperties redactProps;
+    RedactConfig redactProps;
 
     @Autowired
     PasswordEncoder passwordEncoder;

@@ -41,10 +41,10 @@ public class ReviewerController {
     private final Logger log = LoggerFactory.getLogger(ReviewerController.class);
     
     @Autowired
-    ArticleService articleServ;
+    private ArticleService articleServ;
     
     @Autowired
-    ReviewerService reviewerServ;
+    private ReviewerService reviewerServ;
     
     @GetMapping("/articles")
     @Transactional
