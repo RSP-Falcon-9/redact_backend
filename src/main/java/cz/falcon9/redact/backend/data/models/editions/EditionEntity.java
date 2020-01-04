@@ -19,7 +19,7 @@ public class EditionEntity {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private Integer number;
+        private Integer id;
         private String description;
         private ZonedDateTime deadline;
         private boolean archived;
@@ -46,8 +46,8 @@ public class EditionEntity {
             return this;
         }
 
-        public Builder withNumber(Integer number) {
-            this.number = number;
+        public Builder withId(Integer id) {
+            this.id = id;
             return this;
         }
     }
@@ -63,7 +63,7 @@ public class EditionEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer number;
+    private Integer id;
 
     @Column(nullable = false)
     private String description;
@@ -76,7 +76,7 @@ public class EditionEntity {
 
     @Generated("SparkTools")
     private EditionEntity(Builder builder) {
-        this.number = builder.number;
+        this.id = builder.id;
         this.description = builder.description;
         this.deadline = builder.deadline;
         this.archived = builder.archived;
@@ -90,8 +90,8 @@ public class EditionEntity {
         return description;
     }
 
-    public Integer getNumber() {
-        return number;
+    public Integer getId() {
+        return id;
     }
 
     public boolean isArchived() {

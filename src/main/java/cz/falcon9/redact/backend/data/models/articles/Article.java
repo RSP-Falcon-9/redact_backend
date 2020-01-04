@@ -86,11 +86,11 @@ public class Article {
     @JoinColumn(name="author_id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="articleId")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "articleId")
     private List<ArticleVersion> versions;
     
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name="id", nullable = true)
+    @JoinColumn(name = "edition", referencedColumnName= "id", nullable = true)
     private EditionEntity edition;
 
     private Article() { }

@@ -22,6 +22,12 @@ public class RedactConfigProvider {
         if (!articlesDir.exists()) {
             articlesDir.mkdirs();
         }
+        
+        // create archives directory if it doesn't exist
+        File archivesDir = new File(config.getArchivesDir());
+        if (!archivesDir.exists()) {
+            archivesDir.mkdirs();
+        }
     }
     
     public String getArticlesPath() {
@@ -30,6 +36,10 @@ public class RedactConfigProvider {
     
     public String getArchivesPath() {
         return config.getArchivesDir();
+    }
+    
+    public String getJwtSecret() {
+        return config.getJwtSecret();
     }
     
     public String getArticlePdfFilePath(String articleId, Integer articleVersion) {

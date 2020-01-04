@@ -24,7 +24,7 @@ public class UnauthorizedController {
     public BaseDto<List<String>> handleGetArchives() {
         return new BaseDto<List<String>>(
                 editionServ.getArchivedEditions().stream()
-                .map(archivedEdition -> archivedEdition.getNumber().toString())
+                .map(archivedEdition -> archivedEdition.getId().toString())
                 .collect(Collectors.toList()),
                 "Successfully got list of archives.");
     }

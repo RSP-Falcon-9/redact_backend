@@ -21,7 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import cz.falcon9.redact.backend.auth.JwtAuthenticationFilter;
 import cz.falcon9.redact.backend.auth.JwtAuthorizationFilter;
-import cz.falcon9.redact.backend.config.RedactConfig;
+import cz.falcon9.redact.backend.providers.RedactConfigProvider;
 
 @Configuration
 @EnableGlobalMethodSecurity(
@@ -31,13 +31,13 @@ import cz.falcon9.redact.backend.config.RedactConfig;
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    DataSource dataSource;   
+    private DataSource dataSource;   
 
     @Autowired
-    RedactConfig redactProps;
+    private RedactConfigProvider config;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -81,8 +81,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
                 .csrf()
             .disable()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), redactProps.getJwtSecret()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), redactProps.getJwtSecret()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), config.getJwtSecret()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), config.getJwtSecret()))
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()

@@ -46,16 +46,16 @@ public class ChiefEditorController {
     
     @PostMapping("/edition")
     public BaseDto<ChiefEditorEdition> createEdition(@RequestBody @Valid CreateEditionRequest request) {
-        EditionEntity entity = editionServ.createNew(request.getDescription(), request.getDeadline());
+        EditionEntity edition = editionServ.createNew(request.getDescription(), request.getDeadline());
         
         return new BaseDto<ChiefEditorEdition>(
                 ChiefEditorEdition.builder()
-                .withNumber(entity.getNumber())
-                .withDescription(entity.getDescription())
-                .withDeadline(entity.getDeadline())
-                .withArchived(entity.isArchived())
+                .withNumber(edition.getId())
+                .withDescription(edition.getDescription())
+                .withDeadline(edition.getDeadline())
+                .withArchived(edition.isArchived())
                 .build(),
-                String.format("Edition %s was successfully created!", entity.getNumber()));
+                String.format("Edition %s was successfully created!", edition.getId()));
     }
     
     @DeleteMapping("/edition/{editionNumber}")

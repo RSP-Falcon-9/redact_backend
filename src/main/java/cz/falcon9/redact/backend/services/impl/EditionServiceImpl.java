@@ -79,7 +79,7 @@ public class EditionServiceImpl implements EditionService {
         
         return editionRepo.save(
                 EditionEntity.builder()
-                .withNumber(edition.getNumber())
+                .withId(edition.getId())
                 .withDescription(description)
                 .withDeadline(deadline)
                 .withArchived(edition.isArchived())
@@ -96,7 +96,7 @@ public class EditionServiceImpl implements EditionService {
         
         editionRepo.save(
                 EditionEntity.builder()
-                .withNumber(edition.getNumber())
+                .withId(edition.getId())
                 .withDescription(edition.getDescription())
                 .withDeadline(edition.getDeadline())
                 .withArchived(true)
