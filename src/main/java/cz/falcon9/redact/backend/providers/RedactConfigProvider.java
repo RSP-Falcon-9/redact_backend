@@ -51,10 +51,10 @@ public class RedactConfigProvider {
                 .concat(".pdf");
     }
     
-    public String getArchiveZipFilePath(Integer version) {
+    public String getArchiveZipFilePath(Integer number) {
         return config.getArchivesDir()
                 .concat(File.separator)
-                .concat(version.toString())
+                .concat(number.toString())
                 .concat(".zip");
     }
     

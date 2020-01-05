@@ -67,6 +67,7 @@ public class AuthorController {
                                                         .withStatus(articleVersion.getStatus())
                                                         .build())
                                                 .collect(Collectors.toList()))
+                                        .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                                         .build())
                                 .collect(Collectors.toList()))
                         .build(),
@@ -96,6 +97,7 @@ public class AuthorController {
                                 .withStatus(articleVersion.getStatus())
                                 .build())
                         .collect(Collectors.toList()))
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .build(),
                 String.format("Successfully created article with id %s.", article.getId()));
     }
@@ -122,6 +124,7 @@ public class AuthorController {
                                 .withStatus(articleVersion.getStatus())
                                 .build())
                         .collect(Collectors.toList()))
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .build(),
                 String.format("Successfully updated article with id %s.", article.getId()));
     }
@@ -155,6 +158,7 @@ public class AuthorController {
         
         return new BaseDto<GetAuthorArticleDetail>(GetAuthorArticleDetail.builder()
                 .withName(article.getName())
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .withReviews(authorReviews)
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));

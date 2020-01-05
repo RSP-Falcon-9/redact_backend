@@ -10,6 +10,7 @@ import cz.falcon9.redact.backend.data.models.articles.Article;
 
 public interface ArticleRepository extends CrudRepository<Article, String> {
     
+    // TODO: Pagination
     List<Article> findAll();
     
     @Query("SELECT a FROM Article a WHERE a.user.userName = :authorId")
@@ -20,6 +21,9 @@ public interface ArticleRepository extends CrudRepository<Article, String> {
     
     @Query("SELECT DISTINCT a FROM Article a JOIN a.versions v JOIN v.reviews r WHERE r.reviewer.userName = :reviewerId")
     List<Article> findByReviewer(@Param("reviewerId") String reviewerId);
+    
+    @Query("SELECT a FROM Article a WHERE a.edition.id = :edition")
+    List<Article> findByEdition(@Param("edition") int edition);
     
 }
 

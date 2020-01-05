@@ -97,6 +97,7 @@ public class EditorController {
         
         return new BaseDto<GetEditorArticleDetail>(GetEditorArticleDetail.builder()
                 .withName(article.getName())
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .withReviews(editorReviews)
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", articleId, version));
@@ -120,7 +121,7 @@ public class EditorController {
                                                         .withStatus(articleVersion.getStatus())
                                                         .build())
                                                 .collect(Collectors.toList()))
-                                        .withEdition(article.getEdition().getId())
+                                        .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                                         .build())
                                 .collect(Collectors.toList()))
                         .build(),
@@ -154,9 +155,11 @@ public class EditorController {
     @GetMapping("/set-article-edition/{articleId}")
     public BaseDto<Void> handleSetArticleEdition(@PathVariable String articleId,
             @RequestParam @NotNull Integer editionNumber) {
-        articleServ.setArticleEdition(articleId, editionNumber);
         
-        return new BaseDto<Void>(String.format("Successfully set article %s edition to %s.", articleId, editionNumber));
+        articleServ.setArticleEdition(articleId, editionNumber == -1 ? null : editionNumber);
+        
+        return new BaseDto<Void>(String.format("Successfully set article %s edition to %s.", 
+                articleId, editionNumber == -1 ? null : editionNumber));
     }
     
 }

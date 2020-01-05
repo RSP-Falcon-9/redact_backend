@@ -36,7 +36,7 @@ public class UnauthenticatedController {
                 "Successfully got list of archives.");
     }
     
-    @GetMapping("/archive/{editionNumber}")
+    @GetMapping(value = "/archive/{editionNumber}", produces="application/zip")
     public FileSystemResource handleGetArchiveFile(@PathVariable Integer editionNumber) {
         return editionServ.getArchiveFile(editionNumber);
     }
