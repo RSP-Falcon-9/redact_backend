@@ -1,8 +1,5 @@
 package cz.falcon9.redact.backend.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
+import cz.falcon9.redact.backend.data.dtos.Edition;
 import cz.falcon9.redact.backend.data.dtos.chiefeditor.CreateEditionRequest;
 import cz.falcon9.redact.backend.data.dtos.chiefeditor.CreateEditionResponse;
-import cz.falcon9.redact.backend.data.dtos.chiefeditor.GetEditionsResponse;
-import cz.falcon9.redact.backend.data.dtos.chiefeditor.structures.Edition;
 import cz.falcon9.redact.backend.data.models.editions.EditionEntity;
 import cz.falcon9.redact.backend.services.ArticleService;
 import cz.falcon9.redact.backend.services.EditionService;
@@ -48,24 +44,6 @@ public class ChiefEditorController {
         articleServ.removeArticle(articleId);
         
         return new BaseDto<Void>(String.format("Article %s deleted successfully!", articleId));
-    }
-    
-    @GetMapping("/editions")
-    public BaseDto<GetEditionsResponse> handleGetEditions() {
-        List<Edition> editions = editionServ.getEditions().stream()
-                .map(editionEntity ->Edition.builder()
-                        .withId(editionEntity.getId())
-                        .withDescription(editionEntity.getDescription())
-                        .withDeadline(editionEntity.getDeadline())
-                        .withArchived(editionEntity.isArchived())
-                        .build())
-                .collect(Collectors.toList());
-        
-        return new BaseDto<GetEditionsResponse>(
-                GetEditionsResponse.builder()
-                .withEditions(editions)
-                .build(),
-                "Successfully got editions!");
     }
     
     @PostMapping("/edition")

@@ -74,6 +74,8 @@ public class EditionEntity {
     @Column
     private boolean archived;
 
+    private EditionEntity() {}
+    
     @Generated("SparkTools")
     private EditionEntity(Builder builder) {
         this.id = builder.id;

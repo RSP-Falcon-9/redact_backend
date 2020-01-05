@@ -120,6 +120,7 @@ public class EditorController {
                                                         .withStatus(articleVersion.getStatus())
                                                         .build())
                                                 .collect(Collectors.toList()))
+                                        .withEdition(article.getEdition().getId())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build(),
@@ -157,5 +158,5 @@ public class EditorController {
         
         return new BaseDto<Void>(String.format("Successfully set article %s edition to %s.", articleId, editionNumber));
     }
-
+    
 }

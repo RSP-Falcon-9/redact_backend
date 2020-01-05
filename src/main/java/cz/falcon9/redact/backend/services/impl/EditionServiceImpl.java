@@ -36,6 +36,15 @@ public class EditionServiceImpl implements EditionService {
     }
     
     @Override
+    public List<EditionEntity> getUnarchivedEditions() {
+        List<EditionEntity> editions = new ArrayList<>();
+        
+        editionRepo.findAllUnarchived().forEach(editions::add);;
+        
+        return editions;
+    }
+    
+    @Override
     public List<EditionEntity> getArchivedEditions() {
         List<EditionEntity> editions = new ArrayList<>();
         

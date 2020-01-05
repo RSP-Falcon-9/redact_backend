@@ -1,7 +1,8 @@
 package cz.falcon9.redact.backend.data.dtos.chiefeditor;
 
-import cz.falcon9.redact.backend.data.dtos.chiefeditor.structures.Edition;
 import javax.annotation.Generated;
+
+import cz.falcon9.redact.backend.data.dtos.Edition;
 
 public class CreateEditionResponse {
 

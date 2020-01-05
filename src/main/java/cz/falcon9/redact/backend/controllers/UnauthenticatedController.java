@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.falcon9.redact.backend.data.dtos.BaseDto;
+import cz.falcon9.redact.backend.data.dtos.Edition;
+import cz.falcon9.redact.backend.data.dtos.GetEditionsResponse;
 import cz.falcon9.redact.backend.data.dtos.unauthenticated.GetArchivesResponse;
 import cz.falcon9.redact.backend.services.EditionService;
 
@@ -37,6 +39,24 @@ public class UnauthenticatedController {
     @GetMapping("/archive/{editionNumber}")
     public FileSystemResource handleGetArchiveFile(@PathVariable Integer editionNumber) {
         return editionServ.getArchiveFile(editionNumber);
+    }
+    
+    @GetMapping("/editions")
+    public BaseDto<GetEditionsResponse> handleGetEditions() {
+        List<Edition> editions = editionServ.getEditions().stream()
+                .map(editionEntity ->Edition.builder()
+                        .withId(editionEntity.getId())
+                        .withDescription(editionEntity.getDescription())
+                        .withDeadline(editionEntity.getDeadline())
+                        .withArchived(editionEntity.isArchived())
+                        .build())
+                .collect(Collectors.toList());
+        
+        return new BaseDto<GetEditionsResponse>(
+                GetEditionsResponse.builder()
+                .withEditions(editions)
+                .build(),
+                "Successfully got editions!");
     }
     
 }

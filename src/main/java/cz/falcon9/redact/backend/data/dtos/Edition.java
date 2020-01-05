@@ -1,4 +1,4 @@
-package cz.falcon9.redact.backend.data.dtos.chiefeditor.structures;
+package cz.falcon9.redact.backend.data.dtos;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Generated;

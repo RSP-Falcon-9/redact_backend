@@ -10,6 +10,7 @@ import cz.falcon9.redact.backend.data.models.editions.EditionEntity;
 public interface EditionService {
     
     List<EditionEntity> getEditions();
+    List<EditionEntity> getUnarchivedEditions();
     List<EditionEntity> getArchivedEditions();
     FileSystemResource getArchiveFile(Integer number);
     EditionEntity getEdition(Integer number);

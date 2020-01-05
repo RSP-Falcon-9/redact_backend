@@ -12,4 +12,7 @@ public interface EditionRepository extends CrudRepository<EditionEntity, Integer
     @Query("SELECT e FROM EditionEntity e WHERE e.archived = true")
     List<EditionEntity> findAllArchived();
     
+    @Query("SELECT e FROM EditionEntity e WHERE e.archived = false")
+    List<EditionEntity> findAllUnarchived();
+    
 }

@@ -17,6 +17,7 @@ public class EditorArticle {
         private String name;
         private String authorId;
         private List<AuthorArticleVersion> versions = Collections.emptyList();
+        private int edition;
 
         private Builder() {
         }
@@ -44,6 +45,11 @@ public class EditorArticle {
             this.versions = versions;
             return this;
         }
+        
+        public Builder withEdition(int edition) {
+            this.edition = edition;
+            return this;
+        }
     }
 
     /**
@@ -63,12 +69,15 @@ public class EditorArticle {
     
     private List<AuthorArticleVersion> versions;
     
+    private int edition;
+    
     @Generated("SparkTools")
     private EditorArticle(Builder builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.authorId = builder.authorId;
         this.versions = builder.versions;
+        this.edition = builder.edition;
     }
 
     public String getAuthorId() {
@@ -85,6 +94,10 @@ public class EditorArticle {
 
     public List<AuthorArticleVersion> getVersions() {
         return versions;
+    }
+    
+    public int getEdition() {
+        return edition;
     }
     
 }
