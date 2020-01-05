@@ -95,7 +95,7 @@ public class ArticleServiceImpl implements ArticleService {
         versions.add(ArticleVersion.builder()
                 .withArticleId(articleId)
                 .withFileName(String.format("%s_%s", articleId, 1))
-                .withVersion(0)
+                .withVersion(1)
                 .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
                 .withStatus(ArticleStatus.NEW)
                 .build());
@@ -187,15 +187,19 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public FileSystemResource getArticleFile(String articleId, Integer version) {
-        Optional<Article> optionalArticle = articleRepo.findById(articleId);
-        if (!optionalArticle.isPresent()) {
-            throw new ArgumentNotFoundException(String.format("No file for article %s exists.", articleId));
+        Article article = articleRepo.findById(articleId)
+                .orElseThrow(() -> 
+                    new ArgumentNotFoundException(String.format("No file for article %s exists.", articleId))
+                );
+        
+        ArticleVersion articleVersion = article.getVersion(version);
+        if (articleVersion == null) {
+            throw new ArgumentNotFoundException(String.format("No file for article version %s exists.", articleVersion));
         }
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Set<String> roles = authentication.getAuthorities().stream()
                 .map(r -> r.getAuthority()).collect(Collectors.toSet());
-        Article article = optionalArticle.get();
         boolean allowedToSee = roles.contains("ROLE_ADMIN") || roles.contains("ROLE_CHIEF_EDITOR") || roles.contains("ROLE_EDITOR");
         
         if (roles.contains("ROLE_AUTHOR") && article.getUser().getUserName().equals(authentication.getName())) {
@@ -203,7 +207,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         
         if (roles.contains("ROLE_REVIEWER") &&
-                (article.getVersion(version).getReviewWithReviewer(authentication.getName()) != null)) {
+                (articleVersion.getReviewWithReviewer(authentication.getName()) != null)) {
             allowedToSee = true;
         }
         

@@ -77,14 +77,14 @@ public class AuthorController {
     @PostMapping("/article")
     public BaseDto<AuthorArticle> handleCreateArticle(
             @RequestParam(value = "name") String name,
-            @RequestParam(value = "editionNumber") Integer editionNumber,
+            @RequestParam(value = "edition") Integer edition,
             @RequestParam(value = "file") MultipartFile file) {
         String[] fileNameParts = file.getOriginalFilename().split("\\.");
         if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
             throw new InvalidArgumentException("Only .pdf files are supported!");
         }
         
-        Article article = articleService.insertNewArticle(name, editionNumber, file);
+        Article article = articleService.insertNewArticle(name, edition, file);
 
         return new BaseDto<AuthorArticle>(AuthorArticle.builder()
                 .withId(article.getId())
