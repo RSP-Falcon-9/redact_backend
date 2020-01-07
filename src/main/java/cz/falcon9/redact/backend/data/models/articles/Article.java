@@ -13,6 +13,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import cz.falcon9.redact.backend.data.models.auth.User;
+import cz.falcon9.redact.backend.data.models.editions.EditionEntity;
+
 import javax.annotation.Generated;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,12 +32,18 @@ public class Article {
         private String name;
         private User user;
         private List<ArticleVersion> versions = Collections.emptyList();
+        private EditionEntity edition;
 
         private Builder() {
         }
 
         public Article build() {
             return new Article(this);
+        }
+
+        public Builder withEdition(EditionEntity edition) {
+            this.edition = edition;
+            return this;
         }
 
         public Builder withId(String id) {
@@ -67,20 +75,24 @@ public class Article {
     public static Builder builder() {
         return new Builder();
     }
-    
+
     @Id
     private String id;
 
     @Column(name = "name", nullable = false)
     private String name;
-
+    
     @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
+    @JoinColumn(name="author_id", nullable = false)
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="articleId")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "articleId")
     private List<ArticleVersion> versions;
     
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "edition", referencedColumnName= "id", nullable = true)
+    private EditionEntity edition;
+
     private Article() { }
 
     @Generated("SparkTools")
@@ -89,8 +101,13 @@ public class Article {
         this.name = builder.name;
         this.user = builder.user;
         this.versions = builder.versions;
+        this.edition = builder.edition;
     }
-
+    
+    public EditionEntity getEdition() {
+        return edition;
+    }
+    
     public String getId() {
         return id;
     }
@@ -98,11 +115,11 @@ public class Article {
     public ArticleVersion getLatestVersion() {
         return versions.stream().max(Comparator.comparingInt(ArticleVersion::getVersion)).get();
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public User getUser() {
         return user;
     }

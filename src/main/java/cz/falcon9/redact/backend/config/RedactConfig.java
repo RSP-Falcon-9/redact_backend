@@ -1,13 +1,11 @@
-package cz.falcon9.redact.backend.properties;
+package cz.falcon9.redact.backend.config;
 
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
 @ConfigurationProperties("redact")
-public class RedactProperties {
+public class RedactConfig {
 
     @NotBlank
     private String jwtSecret;
@@ -15,6 +13,17 @@ public class RedactProperties {
     @NotBlank
     private String articlesDir;
     
+    @NotBlank
+    private String archivesDir;
+    
+    public String getArchivesDir() {
+        return archivesDir;
+    }
+
+    public void setArchivesDir(String archivesDir) {
+        this.archivesDir = archivesDir;
+    }
+
     public String getArticlesDir() {
         return articlesDir;
     }

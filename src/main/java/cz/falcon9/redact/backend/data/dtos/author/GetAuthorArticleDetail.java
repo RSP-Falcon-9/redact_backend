@@ -13,6 +13,7 @@ public class GetAuthorArticleDetail {
     @Generated("SparkTools")
     public static final class Builder {
         private String name;
+        private Integer edition;
         private List<AuthorArticleReview> reviews = Collections.emptyList();
 
         private Builder() {
@@ -20,6 +21,11 @@ public class GetAuthorArticleDetail {
 
         public GetAuthorArticleDetail build() {
             return new GetAuthorArticleDetail(this);
+        }
+
+        public Builder withEdition(Integer edition) {
+            this.edition = edition;
+            return this;
         }
 
         public Builder withName(String name) {
@@ -32,7 +38,7 @@ public class GetAuthorArticleDetail {
             return this;
         }
     }
-
+    
     /**
      * Creates builder to build {@link GetAuthorArticleDetail}.
      * @return created builder
@@ -41,15 +47,23 @@ public class GetAuthorArticleDetail {
     public static Builder builder() {
         return new Builder();
     }
-    
+
     private String name;
+
+    private Integer edition;
 
     private List<AuthorArticleReview> reviews;
 
     @Generated("SparkTools")
     private GetAuthorArticleDetail(Builder builder) {
         this.name = builder.name;
+        this.edition = builder.edition;
         this.reviews = builder.reviews;
+        this.edition = builder.edition;
+    }
+
+    public Integer getEdition() {
+        return edition;
     }
 
     public String getName() {

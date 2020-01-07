@@ -32,13 +32,13 @@ import cz.falcon9.redact.backend.data.models.articles.ArticleVersion;
 import cz.falcon9.redact.backend.data.models.auth.User;
 import cz.falcon9.redact.backend.exceptions.ArgumentNotFoundException;
 import cz.falcon9.redact.backend.exceptions.ForbiddenException;
-//import cz.falcon9.redact.backend.exceptions.ForbiddenException;
 import cz.falcon9.redact.backend.exceptions.InternalException;
 import cz.falcon9.redact.backend.exceptions.InvalidArgumentException;
-import cz.falcon9.redact.backend.properties.RedactProperties;
+import cz.falcon9.redact.backend.providers.RedactConfigProvider;
 import cz.falcon9.redact.backend.repositories.ArticleRepository;
 import cz.falcon9.redact.backend.repositories.UserRepository;
 import cz.falcon9.redact.backend.services.ArticleService;
+import cz.falcon9.redact.backend.services.EditionService;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -46,13 +46,17 @@ public class ArticleServiceImpl implements ArticleService {
     private final Logger log = LoggerFactory.getLogger(ArticleServiceImpl.class);
     
     @Autowired
-    RedactProperties redactProps;
+    private RedactConfigProvider config;
     
     @Autowired
-    ArticleRepository articleRepo;
+    private ArticleRepository articleRepo;
     
     @Autowired
-    UserRepository userRepo;
+    private UserRepository userRepo;
+    
+    @Autowired
+    private EditionService editionServ;
+    
     
     @Override
     public List<Article> getAllArticles() {
@@ -75,7 +79,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
     
     @Override
-    public Article insertNewArticle(String name, MultipartFile file) {
+    public Article insertNewArticle(String name, Integer editionNumber, MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> user = userRepo.findById(authentication.getName());
         
@@ -86,13 +90,12 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         String articleId = UUID.randomUUID().toString();
-        String fileName = articleId.concat("_").concat("0").concat(".pdf");
         ArrayList<ArticleVersion> versions = new ArrayList<ArticleVersion>();
         
         versions.add(ArticleVersion.builder()
                 .withArticleId(articleId)
-                .withFileName(fileName)
-                .withVersion(0)
+                .withFileName(String.format("%s_%s", articleId, 1))
+                .withVersion(1)
                 .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
                 .withStatus(ArticleStatus.NEW)
                 .build());
@@ -102,20 +105,15 @@ public class ArticleServiceImpl implements ArticleService {
                 .withName(name)
                 .withUser(user.get())
                 .withVersions(versions)
+                .withEdition(editionNumber != null ? editionServ.getEdition(editionNumber) : null)
                 .build();
 
         try (InputStream is = file.getInputStream()) {
-            // create folder if it doesn't exist
-            File dir = new File(redactProps.getArticlesDir());
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            
             byte[] buffer = new byte[is.available()]; 
-            File f = new File(dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            File f = new File(config.getArticlePdfFilePath(articleId, 1));
             OutputStream os = new FileOutputStream(f);
             
-            log.debug("Testing file output dir: {}", dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            log.warn("Testing file output dir: {}", config.getArticlePdfFilePath(articleId, 1));
             
             is.read(buffer);
             os.write(buffer);
@@ -139,13 +137,8 @@ public class ArticleServiceImpl implements ArticleService {
             
             throw new InvalidArgumentException(String.format("User %s is not valid!", authentication.getName()));
         }
-
-        Optional<Article> optionalArticle = articleRepo.findById(id);
-        if (!optionalArticle.isPresent()) {
-            throw new ArgumentNotFoundException(String.format("Article %s doesn't exist!", authentication.getName()));
-        }
         
-        Article article = optionalArticle.get();
+        Article article = getArticle(id);
         ArticleVersion articleVersion = article.getLatestVersion();
         if (articleVersion.getStatus() != ArticleStatus.DENIED) {
             throw new InvalidArgumentException(String.format("Cannot upload new version until article %s version %s is denied!",
@@ -153,28 +146,21 @@ public class ArticleServiceImpl implements ArticleService {
         }
         
         Integer nextVersion = articleVersion.getVersion() + 1;
-        String fileName = id.concat("_").concat(String.valueOf(nextVersion)).concat(".pdf");
         
         article.getVersions().add(ArticleVersion.builder()
                 .withArticleId(id)
-                .withFileName(fileName)
+                .withFileName(getFileName(id, nextVersion))
                 .withVersion(nextVersion)
                 .withPublishDate(new Date(Calendar.getInstance().getTime().getTime()))
                 .withStatus(ArticleStatus.NEW)
                 .build());
 
         try (InputStream is = file.getInputStream()) {
-            // create folder if it doesn't exist
-            File dir = new File(redactProps.getArticlesDir());
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            
             byte[] buffer = new byte[is.available()]; 
-            File f = new File(dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            File f = new File(config.getArticlePdfFilePath(id, nextVersion));
             OutputStream os = new FileOutputStream(f);
             
-            log.debug("Testing file output dir: {}", dir.getCanonicalPath().concat(File.separator).concat(fileName));
+            log.debug("Testing file output dir: {}", config.getArticlePdfFilePath(id, nextVersion));
             
             is.read(buffer);
             os.write(buffer);
@@ -201,15 +187,19 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public FileSystemResource getArticleFile(String articleId, Integer version) {
-        Optional<Article> optionalArticle = articleRepo.findById(articleId);
-        if (!optionalArticle.isPresent()) {
-            throw new ArgumentNotFoundException(String.format("No file for article %s exists.", articleId));
+        Article article = articleRepo.findById(articleId)
+                .orElseThrow(() -> 
+                    new ArgumentNotFoundException(String.format("No file for article %s exists.", articleId))
+                );
+        
+        ArticleVersion articleVersion = article.getVersion(version);
+        if (articleVersion == null) {
+            throw new ArgumentNotFoundException(String.format("No file for article version %s exists.", articleVersion));
         }
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Set<String> roles = authentication.getAuthorities().stream()
                 .map(r -> r.getAuthority()).collect(Collectors.toSet());
-        Article article = optionalArticle.get();
         boolean allowedToSee = roles.contains("ROLE_ADMIN") || roles.contains("ROLE_CHIEF_EDITOR") || roles.contains("ROLE_EDITOR");
         
         if (roles.contains("ROLE_AUTHOR") && article.getUser().getUserName().equals(authentication.getName())) {
@@ -217,7 +207,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
         
         if (roles.contains("ROLE_REVIEWER") &&
-                (article.getVersion(version).getReviewWithReviewer(authentication.getName()) != null)) {
+                (articleVersion.getReviewWithReviewer(authentication.getName()) != null)) {
             allowedToSee = true;
         }
         
@@ -225,13 +215,32 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ForbiddenException("You don't have access to this article!");
         }
         
-        File articleFile = new File(redactProps.getArticlesDir().concat(File.separator)
-                .concat(articleId).concat("_").concat(version.toString()).concat(".pdf"));
+        File articleFile = new File(config.getArticlePdfFilePath(articleId, version));
         if (!articleFile.exists()) {
-            throw new ArgumentNotFoundException("File for give article/version doesn't exist.");
+            throw new ArgumentNotFoundException("File for given article/version doesn't exist.");
         }
 
         return new FileSystemResource(articleFile);
+    }
+    
+    @Override
+    public void removeArticle(String articleId, Integer version) {
+        Article article = getArticle(articleId);
+        
+        articleRepo.delete(article);
+    }
+    
+    @Override
+    public void removeArticle(String articleId) {
+        Article article = getArticle(articleId);
+        
+        article.getVersions().stream().forEach(version -> {
+            File articleFile = new File(config.getArticlePdfFilePath(articleId, version.getVersion()));
+            
+            articleFile.delete();
+        });
+        
+        articleRepo.delete(article);
     }
     
     @Override
@@ -286,6 +295,28 @@ public class ArticleServiceImpl implements ArticleService {
         articleVersion.setStatus(status);
         
         updateArticle(article);
+    }
+    
+    @Override
+    public void setArticleEdition(String articleId, Integer editionNumber) {
+        Article article = getArticle(articleId);
+
+        updateArticle(
+                Article.builder()
+                .withId(article.getId())
+                .withName(article.getName())
+                .withUser(article.getUser())
+                .withVersions(article.getVersions())
+                .withEdition(editionServ.getEdition(editionNumber))
+                .build());
+    }
+    
+    private String getFileName(String articleId, Integer version) {
+        return articleId
+                .concat(articleId)
+                .concat("_")
+                .concat(version.toString())
+                .concat("pdf");
     }
     
 }

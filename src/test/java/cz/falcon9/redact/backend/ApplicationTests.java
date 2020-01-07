@@ -10,7 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestInstance(Lifecycle.PER_CLASS)
-public class RedactBackendApplicationTests {
+public class ApplicationTests {
 
 	@Test
 	public void contextLoads() {

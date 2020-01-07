@@ -42,10 +42,10 @@ import cz.falcon9.redact.backend.services.ReviewService;
 public class AuthorController {
 
     @Autowired
-    ArticleService articleService;
+    private ArticleService articleService;
     
     @Autowired
-    ReviewService reviewServ;
+    private ReviewService reviewServ;
     
     @GetMapping("/articles")
     @Transactional
@@ -67,6 +67,7 @@ public class AuthorController {
                                                         .withStatus(articleVersion.getStatus())
                                                         .build())
                                                 .collect(Collectors.toList()))
+                                        .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                                         .build())
                                 .collect(Collectors.toList()))
                         .build(),
@@ -74,14 +75,18 @@ public class AuthorController {
     }
     
     @PostMapping("/article")
-    public BaseDto<AuthorArticle> handleCreateArticle(@RequestParam(value = "name") String name,
+    public BaseDto<AuthorArticle> handleCreateArticle(
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "edition") String edition,
             @RequestParam(value = "file") MultipartFile file) {
         String[] fileNameParts = file.getOriginalFilename().split("\\.");
         if (fileNameParts.length != 2 || (fileNameParts.length == 2 && !fileNameParts[1].equals("pdf"))) {
             throw new InvalidArgumentException("Only .pdf files are supported!");
         }
         
-        Article article = articleService.insertNewArticle(name, file);
+        Integer editionNumber = Integer.valueOf(edition);
+        
+        Article article = articleService.insertNewArticle(name, editionNumber == -1 ? null : editionNumber, file);
 
         return new BaseDto<AuthorArticle>(AuthorArticle.builder()
                 .withId(article.getId())
@@ -94,6 +99,7 @@ public class AuthorController {
                                 .withStatus(articleVersion.getStatus())
                                 .build())
                         .collect(Collectors.toList()))
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .build(),
                 String.format("Successfully created article with id %s.", article.getId()));
     }
@@ -120,6 +126,7 @@ public class AuthorController {
                                 .withStatus(articleVersion.getStatus())
                                 .build())
                         .collect(Collectors.toList()))
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .build(),
                 String.format("Successfully updated article with id %s.", article.getId()));
     }
@@ -153,6 +160,7 @@ public class AuthorController {
         
         return new BaseDto<GetAuthorArticleDetail>(GetAuthorArticleDetail.builder()
                 .withName(article.getName())
+                .withEdition(article.getEdition() != null ? article.getEdition().getId() : null)
                 .withReviews(authorReviews)
                 .build(),
                 String.format("Successfully got article with id %s and version %s.", id, version));
