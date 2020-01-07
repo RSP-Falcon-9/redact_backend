@@ -140,8 +140,6 @@ public class EditionServiceImpl implements EditionService {
                 if (article.getLatestVersion().getStatus() != ArticleStatus.ACCEPTED) continue;
                 
                 // get file reference
-                System.out.println(config.getArticlePdfFilePath(article.getId(),
-                        article.getLatestVersion().getVersion()));
                 File articleFile = new File(config.getArticlePdfFilePath(article.getId(),
                         article.getLatestVersion().getVersion()));
                 FileInputStream articleFis = new FileInputStream(articleFile);
@@ -180,6 +178,9 @@ public class EditionServiceImpl implements EditionService {
     @Override
     public void delete(Integer number) {
         editionRepo.deleteById(number);
+        
+        File file = new File(config.getArchiveZipFilePath(number));
+        file.delete();
     }
     
 }
